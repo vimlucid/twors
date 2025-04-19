@@ -1,0 +1,13 @@
+[package]
+name = "twors"
+version = "0.1.0"
+edition = "2024"
+authors = ["Lyudmil Grigorov"]
+description = "A simple 2D game engine based on canvas and WASM written entirely in Rust"
+readme = "README.md"
+repository = "https://github.com/vimlucid/twors"
+license = "MIT"
+keywords = ["game", "engine", "2d", "wasm", "canvas"]
+categories = ["wasm", "rendering::engine", "graphics", "web-programming", "game-engines"]
+
+[dependencies]
