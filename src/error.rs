@@ -6,13 +6,15 @@ pub enum Error {
     Generic(String),
 }
 
-impl Error {
-    pub fn from_string(message: String) -> Error {
-        Error::Generic(message)
-    }
-
-    pub fn from_str(message: &str) -> Error {
+impl From<&str> for Error {
+    fn from(message: &str) -> Self {
         Error::Generic(message.to_owned())
+    }
+}
+
+impl From<String> for Error {
+    fn from(message: String) -> Self {
+        Error::Generic(message)
     }
 }
 

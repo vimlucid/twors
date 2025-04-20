@@ -2,7 +2,7 @@
 
 pub mod error;
 
-use crate::error::{Error, Result};
+use crate::error::Result;
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
@@ -13,32 +13,24 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn draw(canvas_id: &str) -> Result<()> {
-    let not_found_err = |entity: &str| Error::from_string(format!("Did not find '{}'", entity));
+    let not_found_msg = |entity: &str| format!("Did not find '{}'", entity);
 
-    let window = web_sys::window().ok_or_else(|| not_found_err("window"))?;
-    let document = window.document().ok_or_else(|| not_found_err("document"))?;
+    let window = web_sys::window().ok_or_else(|| not_found_msg("window"))?;
+    let document = window.document().ok_or_else(|| not_found_msg("document"))?;
     let canvas = document
         .get_element_by_id(canvas_id)
-        .ok_or_else(|| not_found_err(canvas_id))?;
-    let canvas: HtmlCanvasElement =
-        canvas
-            .dyn_into::<web_sys::HtmlCanvasElement>()
-            .map_err(|_| {
-                Error::from_string(format!("Element with ID '{}' is not a canvas", canvas_id))
-            })?;
+        .ok_or_else(|| not_found_msg(canvas_id))?;
+    let canvas: HtmlCanvasElement = canvas
+        .dyn_into::<web_sys::HtmlCanvasElement>()
+        .map_err(|_| format!("Element with ID '{}' is not a canvas", canvas_id))?;
 
     let context = canvas
         .get_context("2d")
-        .map_err(|err| {
-            Error::from_string(format!(
-                "Error encountered while getting canvas context: {:?}",
-                err
-            ))
-        })?
-        .ok_or_else(|| Error::from_str("Could not find canvas context"))?;
+        .map_err(|err| format!("Error encountered while getting canvas context: {:?}", err))?
+        .ok_or("Could not find canvas context")?;
     let context = context
         .dyn_into::<CanvasRenderingContext2d>()
-        .map_err(|_| Error::from_str("Could not cast into rendering context"))?;
+        .map_err(|_| "Could not cast into rendering context")?;
 
     context.set_fill_style_str("red");
     context.set_line_width(1.0);
