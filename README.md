@@ -6,6 +6,10 @@
 This project aims to be a simple and to-the-point quick way to render some
 graphics using Rust! :crab:
 
+## What's already implemented
+
+At the moment - nothing. Keep checking every week or two for rapid increments.
+
 I already have some features which I'll polish and move to this project soon.
 Here's a list of what you can expect in the upcoming months as first baby steps:
 
@@ -21,20 +25,24 @@ Here's a list of what you can expect in the upcoming months as first baby steps:
 ## Quick start
 
 Install dependencies
+
 ```bash
 # convenience scripts - see "Makefile.toml" for full list of commands
 cargo install cargo-make
 
 # build WASM module and start a HTTP server to serve it
-cargo make serve
+cargo make watch
 ```
 
 ## Development
 
 ```bash
-cargo make watch
+cargo make build # package app
+cargo make serve # like "build", but will also start a HTTP server
+cargo make watch # like "serve", but will restart the server on changes
+
+cargo make clean
+cargo make format
+cargo make install-git-hooks # will be run on "build" automatically
+cargo make licenses # update licenses.html (run after dependency addition/removal)
 ```
-
-## Contributing
-
-- Make sure to run `cargo make licenses` after introducing a new dependency
