@@ -8,4 +8,4 @@ allow_warnings = true
 background = false
 on_change_strategy = "kill_then_restart"
 kill = ["pkill", "-INT", "-P"]
-watch = ["assets"]
+watch = ["examples/playground/assets"]

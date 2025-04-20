@@ -22,27 +22,40 @@ Here's a list of what you can expect in the upcoming months as first baby steps:
     - [ ] Basic 2D rectangle-based collision
     - [ ] A "renderable" model built manually from vertices & some primitive styling
 
-## Quick start
+## :zap: Quick start
 
-Install dependencies
+Coming soon.
+
+- In the meantime you can take a look at `examples/playground` - this is how you
+  would use this crate. In a summary you will need:
+    - a `lib` crate with the following setup in `Cargo.toml`:
+        ```
+        [lib]
+        crate-type = ["cdylib"]
+        ```
+    - Build the WASM module: `wasm-pack build --target web`
+    - Serve the resulting `pkg` folder along with an `index.html` (see `examples/playground/assets/index.html`)
+        - **NOTE**: Make sure to serve WASM with a mime type `application/wasm` - [miniserve](https://github.com/svenstaro/miniserve)
+          does this out of the box!
+- To do all of this in a single command for the `playground` example simply run `cargo make serve` and open `http://localhost:8080`
+
+## Development
+
+### Scripts
 
 ```bash
 # convenience scripts - see "Makefile.toml" for full list of commands
 cargo install cargo-make
 
-# build WASM module and start a HTTP server to serve it
-cargo make watch
-```
+# run local pre-commit checks - will be run on "build" automatically
+cargo make install-git-hooks
 
-## Development
-
-```bash
-cargo make build # package app
+cargo make build # build the "playground" crate as a WASM module
 cargo make serve # like "build", but will also start a HTTP server
 cargo make watch # like "serve", but will restart the server on changes
 
+# other commands
 cargo make clean
 cargo make format
-cargo make install-git-hooks # will be run on "build" automatically
 cargo make licenses # update licenses.html (run after dependency addition/removal)
 ```

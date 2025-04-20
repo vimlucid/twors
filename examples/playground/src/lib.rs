@@ -1,5 +1,5 @@
-use crate::{Canvas, Result};
-use wasm_bindgen::prelude::*;
+use twors::{Canvas, Result};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
 pub fn entry(canvas_id: &str) -> Result<()> {
