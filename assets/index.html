@@ -3,13 +3,32 @@
     <head>
         <meta charset="utf-8" />
         <title>TwoRS</title>
+
+        <style>
+            * {
+                margin: 0;
+            }
+
+            html, body {
+                height: 100%;
+            }
+
+            #render-area {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+        </style>
     </head>
+
     <body>
         <script type="module">
-            import init, { greet } from "./twors.js";
+            import init, { draw } from "./twors.js";
             init().then(() => {
-                greet("TwoRS");
+                draw("render-area");
             });
         </script>
+
+        <canvas id="render-area" width="1920" height="1080"></canvas>
     </body>
 </html>

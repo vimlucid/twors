@@ -30,7 +30,12 @@ dependencies = ["pkg-build"]
 install_crate = { crate_name = "miniserve", binary = "miniserve", test_arg = "--help" }
 command = "miniserve"
 args = ["./pkg", "--index", "index.html"]
-dependencies = ["pkg-build"]
+dependencies = ["pkg"]
+
+[tasks.watch]
+install_crate = { crate_name = "bacon", binary = "bacon", test_arg = "--help" }
+command = "bacon"
+args = ["watch"]
 
 [tasks.licenses]
 install_crate = { crate_name = "cargo-about", binary = "cargo-about", test_arg = "--help" }
