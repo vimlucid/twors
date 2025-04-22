@@ -28,11 +28,9 @@ impl Canvas {
         &self.context
     }
 
-    pub fn resize(&self, size: Vertex2<u32>) -> Result<()> {
+    pub fn resize(&self, size: Vertex2<u32>) {
         self.element.set_width(size.x);
         self.element.set_height(size.y);
-
-        Ok(())
     }
 
     pub fn clear(&self) {
