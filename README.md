@@ -5,33 +5,43 @@
 
 Easily render 2D graphics in a canvas - entirely powered by Rust!!! :crab:
 
+## :sunglasses: Why Rust/WASM?
+
+[It's use case](https://webassembly.org/docs/use-cases/) is either the reuse of code written in another language or to offload
+heavy computations to the near-native execution speeds of WASM.
+
+However this is not free - traversing the WASM boundary means going trough [some glue code](https://rustwasm.github.io/wasm-bindgen/contributing/design/index.html)
+and copying data from JS to the [WASM module memory](https://developer.mozilla.org/en-US/docs/WebAssembly/Guides/Concepts)
+and back. In the case of strings it's even more expensive - because
+[JS strings are UTF-16](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#utf-16_characters_unicode_code_points_and_grapheme_clusters)
+and [Rust strings use UTF-8](https://doc.rust-lang.org/std/string/struct.String.html) any string
+passtrough needs to go trough a copy
+[AND a re-encode](https://rustwasm.github.io/wasm-bindgen/reference/types/str.html?highlight=utf-16#utf-16-vs-utf-8).
+
+`twors` doesn't have any complicated physics to offload to WASM at this point in time - neither
+is it making use of some advanced pre-existing Rust library. So why Rust then?
+
+*Simply because Rust is the best!!!*
+
 ## :zap: Quick start
 
 - Here's how to [quickly render a moving rectangle](./docs/quick_start.md)
+    - Check out [lib.rs](./examples/playground/src/lib.rs) for a sneak peek!
 
-## What to expect
+## :pencil: Roadmap
 
-At the moment - just a scaffold project with a main loop and a canvas context for drawing.
-
-Roadmap for the next few months (keep checking every week or two for updates):
-- [x] Delta time & adaptive canvas resolution based on browser window size.
-- [ ] Keyboard & mouse input.
+- [x] Adaptive canvas resolution on resize
+- [x] Delta time
+- [ ] Keyboard & mouse inputs
 - [ ] Component system (with `init()` and `update()` lifecycle methods)
-- [ ] Component building blocks
-    - [ ] Transform for moving & scaling objects (with support for parenting)
-    - [ ] Basic 2D rectangle-based collision
-    - [ ] A "renderable" model built manually from vertices & some primitive styling
-- [ ] Utilities for animating movement over time, drawing curves, etc...
+- [ ] Transform (with inheritance) - translate, scale
+- [ ] Collision detection
+- [ ] Bezier curves
+- [ ] FPS benchmark
 
-## Development
+## :computer: Development
 
-Building WASM packages via `wasm-pack` requires a special library crate.
-Since `twors` is itself a library (and due to the Rust toolchain limitation of having
-only a single `lib` crate per package) we can't use the standard `main.rs` binary crate 
-for testing - you will need to make use of the `playground` crate in the `examples` folder
-to iterate/test your changes.
-
-The cargo scripts below make it very easy to do so:
+Experiments and manual testing are to be done in the `examples/playground` crate.
 
 ```bash
 # convenience scripts - see "Makefile.toml" for full list of commands
