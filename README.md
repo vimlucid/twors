@@ -14,7 +14,7 @@ Easily render 2D graphics in a canvas - entirely powered by Rust!!! :crab:
 At the moment - just a scaffold project with a main loop and a canvas context for drawing.
 
 Roadmap for the next few months (keep checking every week or two for updates):
-- [ ] Delta time & adaptive canvas resolution based on browser window size.
+- [x] Delta time & adaptive canvas resolution based on browser window size.
 - [ ] Keyboard & mouse input.
 - [ ] Component system (with `init()` and `update()` lifecycle methods)
 - [ ] Component building blocks

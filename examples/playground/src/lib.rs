@@ -9,14 +9,15 @@ pub fn entry(canvas_id: &str) -> Result<()> {
     let player_pos = Rc::new(RefCell::new(Vertex2 { x: 0.0, y: 0.0 }));
     let player_pos = player_pos.clone();
 
+    const SPEED: f32 = 30.0;
     main_loop::run(
         canvas_id,
         Rc::new(move |ctx| {
             let mut player_pos = player_pos.borrow_mut();
-            player_pos.x += 2.0;
-            player_pos.y += 1.0;
+            player_pos.x += (SPEED * 2.0 * ctx.delta_time) as f64;
+            player_pos.y += (SPEED * ctx.delta_time) as f64;
 
-            draw_square(ctx, &player_pos, &Vertex2 { x: 40.0, y: 40.0 });
+            draw_square(ctx.render_ctx, &player_pos, &Vertex2 { x: 40.0, y: 40.0 });
 
             Ok(())
         }),
