@@ -25,12 +25,10 @@ is it making use of some advanced pre-existing Rust library. So why Rust then?
 
 ## &#x26A1; Quick start
 
-The `playground` crate in this repo contains basic code for a moving rectangle and some input
-handling.
+The `examples/playground` crate in this repo contains basic code for a moving rectangle and some input
+handling - there are two ways to run it:
 
-- Take a look at the [playground lib.rs](./examples/playground/src/lib.rs) for a sneak peek!
-
-- Experiment by modifying `experiments/playground` and running the code:
+- Experiment by modifying `examples/playground` and running the code:
   ```bash
   cargo install cargo-make # only necessary once
 
@@ -38,7 +36,13 @@ handling.
   cargo make watch
   ```
 
-- Set up rendering in your own crate by visiting [the quick start guide](./docs/quick_start.md)
+- Set up your own crate similarly to `examples/playground` example by visiting
+[the quick start guide](./docs/quick_start.md)
+
+## &#x1F4DA; Docs
+
+- Refer to [the docs](https://docs.rs/twors/latest/twors/) after you have a working setup to
+  experiment with
 
 ## &#x1F4DD; Roadmap
 
