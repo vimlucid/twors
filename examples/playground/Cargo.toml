@@ -7,6 +7,8 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
+console_log = { version = "1.0.0", features = ["color"] }
+log = "0.4.27"
 twors = { path = "../../" }
 wasm-bindgen = "0.2.100"
 web-sys = "0.3.77"

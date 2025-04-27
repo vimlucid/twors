@@ -6,12 +6,15 @@
 cargo new --lib twors_demo
 ```
 
-2. Add `twors` as a dependency, along with `wasm-bindgen` and `web-sys` in `Cargo.toml`
+2. Add `twors` as a dependency, along with `wasm-bindgen`, `web-sys` in `Cargo.toml`. You will
+most likely also need `log` and `console_log` for logging.
 
 ```toml
 [dependencies]
 wasm-bindgen = "*"
 web-sys = "*"
+log = "*"
+console_log = { version = "*", features = ["color"] }
 
 [dependencies.twors]
 git = "https://github.com/vimlucid/twors"

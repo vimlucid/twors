@@ -1,16 +1,21 @@
+use log::info;
 use std::{cell::RefCell, rc::Rc};
-
-use twors::{Result, Vertex2, main_loop};
+use twors::{
+    Result, Vertex2,
+    engine::{self, MouseButton},
+};
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::CanvasRenderingContext2d;
 
 #[wasm_bindgen]
 pub fn entry(canvas_id: &str) -> Result<()> {
+    console_log::init().unwrap();
+
     let player_pos = Rc::new(RefCell::new(Vertex2 { x: 0.0, y: 0.0 }));
     let player_pos = player_pos.clone();
 
     const SPEED: f32 = 30.0;
-    main_loop::run(
+    engine::run(
         canvas_id,
         Rc::new(move |ctx| {
             let mut player_pos = player_pos.borrow_mut();
@@ -18,6 +23,14 @@ pub fn entry(canvas_id: &str) -> Result<()> {
             player_pos.y += (SPEED * ctx.delta_time) as f64;
 
             draw_square(ctx.render_ctx, &player_pos, &Vertex2 { x: 40.0, y: 40.0 });
+
+            if ctx.input.mouse.is_pressed(MouseButton::Main) {
+                info!("LMB pressed!");
+            }
+
+            if ctx.input.mouse.is_released(MouseButton::Main) {
+                info!("LMB released!");
+            }
 
             Ok(())
         }),

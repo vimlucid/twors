@@ -3,9 +3,9 @@
 ![development](https://img.shields.io/badge/maintenance%20status-actively%20developed-brightgreen)
 ![crates.io](https://img.shields.io/crates/v/twors)
 
-Easily render 2D graphics in a canvas - entirely powered by Rust!!! :crab:
+Easily render 2D graphics in a canvas - entirely powered by Rust!!! &#x1F980;
 
-## :sunglasses: Why Rust/WASM?
+## &#x1F60E; Why Rust/WASM?
 
 [It's use case](https://webassembly.org/docs/use-cases/) is either the reuse of code written in another language or to offload
 heavy computations to the near-native execution speeds of WASM.
@@ -23,23 +23,25 @@ is it making use of some advanced pre-existing Rust library. So why Rust then?
 
 *Simply because Rust is the best!!!*
 
-## :zap: Quick start
+## &#x26A1; Quick start
 
 - Here's how to [quickly render a moving rectangle](./docs/quick_start.md)
     - Check out [lib.rs](./examples/playground/src/lib.rs) for a sneak peek!
 
-## :pencil: Roadmap
+## &#x1F4DD; Roadmap
 
 - [x] Adaptive canvas resolution on resize
 - [x] Delta time
-- [ ] Keyboard & mouse inputs
+- [ ] Input
+    - [x] Mouse
+    - [ ] Keyboard
 - [ ] Component system (with `init()` and `update()` lifecycle methods)
 - [ ] Transform (with inheritance) - translate, scale
 - [ ] Collision detection
 - [ ] Bezier curves
 - [ ] FPS benchmark
 
-## :computer: Development
+## &#x1F4BB; Development
 
 Experiments and manual testing are to be done in the `examples/playground` crate.
 
@@ -55,7 +57,13 @@ cargo make serve # like "build", but will also start a HTTP server
 cargo make watch # like "serve", but will restart the server on changes
 
 # other commands
+cargo make test
 cargo make clean
 cargo make format
 cargo make licenses # update licenses.html (run after dependency addition/removal)
 ```
+
+### Notes
+
+- Make sure to use  `wasm_assert!` instead of `assert!` in non-test code to see error messages
+in the browser console.
