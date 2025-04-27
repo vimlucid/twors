@@ -25,16 +25,26 @@ is it making use of some advanced pre-existing Rust library. So why Rust then?
 
 ## &#x26A1; Quick start
 
-- Here's how to [quickly render a moving rectangle](./docs/quick_start.md)
-    - Check out [lib.rs](./examples/playground/src/lib.rs) for a sneak peek!
+The `playground` crate in this repo contains basic code for a moving rectangle and some input
+handling.
+
+- Take a look at the [playground lib.rs](./examples/playground/src/lib.rs) for a sneak peek!
+
+- Experiment by modifying `experiments/playground` and running the code:
+  ```bash
+  cargo install cargo-make # only necessary once
+
+  # compile, build the WASM module, run a HTTP server - rinse and repeat automatically on code changes
+  cargo make watch
+  ```
+
+- Set up rendering in your own crate by visiting [the quick start guide](./docs/quick_start.md)
 
 ## &#x1F4DD; Roadmap
 
 - [x] Adaptive canvas resolution on resize
 - [x] Delta time
-- [ ] Input
-    - [x] Mouse
-    - [ ] Keyboard
+- [x] Keyboard and mouse input handling
 - [ ] Component system (with `init()` and `update()` lifecycle methods)
 - [ ] Transform (with inheritance) - translate, scale
 - [ ] Collision detection

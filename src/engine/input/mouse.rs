@@ -1,23 +1,27 @@
-use super::key_state_map::KeyStateMap;
+use super::{
+    event_listener::{self, EventHandler},
+    key_state_map::KeyStateMap,
+};
 use crate::{Vertex2, error::Result};
-use log::error;
+use log::warn;
 use std::{cell::RefCell, rc::Rc};
-use wasm_bindgen::{JsCast, prelude::Closure};
 use web_sys::{MouseEvent, Window};
 
 #[derive(Eq, PartialEq, Hash, Clone, Copy)]
 #[repr(u8)]
 pub enum Button {
-    Main = 0,
-    Secondary = 1,
+    LMB = 0,
+    MMB = 1,
+    RMB = 2,
 }
 
 impl Button {
     pub fn new(key_code: i16) -> Result<Button> {
         match key_code {
-            0 => Ok(Button::Main),
-            1 => Ok(Button::Secondary),
-            key_code => Err(format!("Unsupported mouse button key code: '{}'", key_code).into()),
+            0 => Ok(Button::LMB),
+            1 => Ok(Button::MMB),
+            2 => Ok(Button::RMB),
+            key_code => Err(format!("Unsupported mouse key code: '{}'", key_code).into()),
         }
     }
 }
@@ -59,14 +63,14 @@ impl Mouse {
 
     fn attach_mouse_down_handler(&self, window: &Window) -> Result<()> {
         let state_map = self.state_map.clone();
-        self.attach_event_listener(
+        event_listener::attach(
             window,
             "mousedown",
-            Closure::new(move |event: MouseEvent| {
+            EventHandler::new(move |event: MouseEvent| {
                 let button = match Button::new(event.button()) {
                     Ok(button) => button,
                     Err(err) => {
-                        error!("{}", err);
+                        warn!("{}", err);
                         return;
                     }
                 };
@@ -78,14 +82,14 @@ impl Mouse {
 
     fn attach_mouse_up_handler(&self, window: &Window) -> Result<()> {
         let state_map = self.state_map.clone();
-        self.attach_event_listener(
+        event_listener::attach(
             window,
             "mouseup",
-            Closure::new(move |event: MouseEvent| {
+            EventHandler::new(move |event: MouseEvent| {
                 let button = match Button::new(event.button()) {
                     Ok(button) => button,
                     Err(err) => {
-                        error!("{}", err);
+                        warn!("{}", err);
                         return;
                     }
                 };
@@ -97,29 +101,14 @@ impl Mouse {
 
     fn attach_mouse_move_handler(&self, window: &Window) -> Result<()> {
         let position = self.position.clone();
-        self.attach_event_listener(
+        event_listener::attach(
             window,
             "mousemove",
-            Closure::new(move |event: MouseEvent| {
+            EventHandler::new(move |event: MouseEvent| {
                 let mut position = position.borrow_mut();
                 position.x = event.client_x();
                 position.y = event.client_y();
             }),
         )
-    }
-
-    fn attach_event_listener(
-        &self,
-        window: &Window,
-        event_name: &str,
-        handler: Closure<dyn Fn(MouseEvent)>,
-    ) -> Result<()> {
-        window
-            .add_event_listener_with_callback(event_name, handler.as_ref().unchecked_ref())
-            .map_err(|_| format!("Failed to attach {} event listener", event_name))?;
-
-        handler.forget();
-
-        Ok(())
     }
 }

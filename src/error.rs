@@ -2,7 +2,7 @@ use wasm_bindgen::JsValue;
 
 #[derive(thiserror::Error, Debug, PartialEq, Clone)]
 pub enum Error {
-    #[error("Something went wrong: {0}")]
+    #[error("Generic error: {0}")]
     Generic(String),
 }
 

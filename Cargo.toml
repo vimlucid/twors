@@ -17,5 +17,5 @@ categories = ["wasm", "rendering::engine", "graphics", "web-programming", "game-
 log = "0.4.27"
 thiserror = "2.0.12"
 wasm-bindgen = "0.2.100"
-web-sys = { version = "0.3.77", features = ["CanvasRenderingContext2d", "Document", "Element", "HtmlCanvasElement", "MouseEvent", "Window"] }
+web-sys = { version = "0.3.77", features = ["CanvasRenderingContext2d", "Document", "Element", "HtmlCanvasElement", "KeyboardEvent", "MouseEvent", "Window"] }
 web-time = "1.1.0"

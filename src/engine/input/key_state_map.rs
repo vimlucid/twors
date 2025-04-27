@@ -1,4 +1,3 @@
-use crate::wasm_assert;
 use std::collections::HashMap;
 use std::hash::Hash;
 
@@ -70,16 +69,10 @@ where
     }
 
     pub fn handle_key_down(&mut self, key: &T) {
-        let curr_state = self.state(key);
-        wasm_assert!(curr_state == KeyState::Up || curr_state == KeyState::Released);
-
         self.keys.insert(key.clone(), KeyState::Pressed);
     }
 
     pub fn handle_key_up(&mut self, key: &T) {
-        let curr_state = self.state(key);
-        wasm_assert!(curr_state == KeyState::Down || curr_state == KeyState::Pressed);
-
         self.keys.insert(key.clone(), KeyState::Released);
     }
 

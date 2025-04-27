@@ -31,4 +31,12 @@
 
         <canvas id="render-area" width="1920" height="1080"></canvas>
     </body>
+
+    <script>
+        // Allow the input module to detect right mouse button clicks - without this the WASM
+        // module will crash on right mouse button clicks.
+        document.getElementById("render-area").addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+        });
+    </script>
 </html>

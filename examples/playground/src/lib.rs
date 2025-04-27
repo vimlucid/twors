@@ -2,7 +2,7 @@ use log::info;
 use std::{cell::RefCell, rc::Rc};
 use twors::{
     Result, Vertex2,
-    engine::{self, MouseButton},
+    engine::{self, Key, Mouse},
 };
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::CanvasRenderingContext2d;
@@ -24,12 +24,16 @@ pub fn entry(canvas_id: &str) -> Result<()> {
 
             draw_square(ctx.render_ctx, &player_pos, &Vertex2 { x: 40.0, y: 40.0 });
 
-            if ctx.input.mouse.is_pressed(MouseButton::Main) {
+            if ctx.input.mouse.is_pressed(Mouse::LMB) {
                 info!("LMB pressed!");
             }
 
-            if ctx.input.mouse.is_released(MouseButton::Main) {
-                info!("LMB released!");
+            if ctx.input.mouse.is_released(Mouse::RMB) {
+                info!("RMB released!");
+            }
+
+            if ctx.input.keyboard.is_down(Key::ControlLeft) {
+                info!("Left CTRL down");
             }
 
             Ok(())

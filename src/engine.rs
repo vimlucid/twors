@@ -1,7 +1,7 @@
 mod animation_frame;
 mod input;
 
-pub use input::MouseButton;
+pub use input::{Key, Mouse};
 
 use crate::{Canvas, Vertex2, error::Result};
 use input::Input;
