@@ -1,4 +1,4 @@
-# :zap: Quick start
+# &#x26A1; Quick start
 
 1. Create a new library crate
 
@@ -6,19 +6,21 @@
 cargo new --lib twors_demo
 ```
 
-2. Add `twors` as a dependency, along with `wasm-bindgen`, `web-sys` in `Cargo.toml`. You will
-most likely also need `log` and `console_log` for logging.
+2. Add `twors` as a dependency, along with [wasm-bindgen](https://crates.io/crates/wasm-bindgen),
+[web-sys](https://crates.io/crates/web-sys)
+and [console_log](https://crates.io/crates/console_log) in `Cargo.toml`.
 
 ```toml
 [dependencies]
 wasm-bindgen = "*"
 web-sys = "*"
-log = "*"
 console_log = { version = "*", features = ["color"] }
 
 [dependencies.twors]
 git = "https://github.com/vimlucid/twors"
 ```
+
+To log something - use the [log](https://crates.io/crates/log) crate.
 
 3. Copy `examples/playground/src/lib.rs` over to `lib.rs` in your new `twors_demo` crate.
 
