@@ -7,7 +7,7 @@ Easily render 2D graphics in a canvas - entirely powered by Rust!!! &#x1F980;
 
 ## &#x1F60E; Why Rust/WASM?
 
-[It's use case](https://webassembly.org/docs/use-cases/) is either the reuse of code written in another language or to offload
+[WASM's use case](https://webassembly.org/docs/use-cases/) is either the reuse of code written in another language or to offload
 heavy computations to the near-native execution speeds of WASM.
 
 However this is not free - traversing the WASM boundary means going trough [some glue code](https://rustwasm.github.io/wasm-bindgen/contributing/design/index.html)
@@ -53,7 +53,7 @@ handling - there are two ways to run it:
 - [ ] Transform (with inheritance) - translate, scale
 - [ ] Collision detection
 - [ ] Bezier curves
-- [ ] FPS benchmark
+- [ ] Benchmark
 
 ## &#x1F4BB; Development
 

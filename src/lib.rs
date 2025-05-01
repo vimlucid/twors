@@ -66,12 +66,18 @@
 //! ```
 
 mod canvas;
+mod engine;
 mod error;
 mod vertex2;
 mod wasm_assert;
 
-pub use canvas::*;
-pub use error::*;
-pub use vertex2::*;
+pub mod shape_factory;
 
-pub mod engine;
+pub use canvas::Canvas;
+pub use engine::{
+    Engine, EngineContext,
+    component::{Component, Logic, Renderable, Transform},
+    input::{Key, Mouse},
+};
+pub use error::{Error, Result};
+pub use vertex2::Vertex2;
