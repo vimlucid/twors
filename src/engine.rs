@@ -5,51 +5,116 @@ mod renderer;
 pub mod component;
 pub mod input;
 
-use crate::{Vertex2, engine::canvas::Canvas, error::Result};
+use crate::{Vertex2, engine::canvas::Canvas, error::Result, wasm_assert};
 use component::Component;
 use input::Input;
+use log::info;
 use std::{
     cell::{Ref, RefCell, RefMut},
+    collections::{HashMap, HashSet},
     rc::Rc,
 };
 use web_sys::{CanvasRenderingContext2d, Window};
-use web_time::{Duration, SystemTime};
+use web_time::{Duration, SystemTime}; // std::time::SystemTime panics in WASM
 
+/// The context is passed to the `on_init` and `on_update` component callbacks.
+///
+/// It's use is to:
+/// - read mouse/keyboard inputs
+/// - add/remove components dynamically
 pub struct Context<'a> {
-    pub delta_time: f32,
     pub input: Ref<'a, Input>,
 
-    canvas: &'a Canvas,
+    delta_time: f32,
+
+    /// We can't modify the components container while mutably iterating on it, so we store the
+    /// component additions from the current frame temporarily - they'll be added on the next frame.
+    components_to_add: HashMap<String, Component>,
+
+    /// We can't modify the components container while mutably iterating on it, so we store the
+    /// component removals from the current frame temporarily - they'll be added on the next frame.
+    components_to_remove: HashSet<String>,
 }
 
 impl<'a> Context<'a> {
-    pub fn new(canvas: &'a Canvas, input: Ref<'a, Input>, delta_time: f32) -> Self {
+    pub fn new(input: Ref<'a, Input>, delta_time: f32) -> Self {
         Self {
-            canvas,
             input,
             delta_time,
+            components_to_add: HashMap::default(),
+            components_to_remove: HashSet::default(),
         }
     }
 
-    pub fn render_ctx(&self) -> &CanvasRenderingContext2d {
-        self.canvas.context()
+    /// This is the number of seconds that passed since the last frame in the main loop.
+    ///
+    /// It's a very small value (e.g. if the application runs at `60` FPS then the delta time will
+    /// be `1/60` = `0.016666666666666666`. If it runs at `30` FPS then delta time will be `1/30`.
+    /// The higher the FPS - the lower the delta time value.
+    ///
+    /// Any movement over time should be multiplied by the delta time - this way the speed will be
+    /// the same across various hardware even if the FPS differs due to hardware capabilities.
+    ///
+    /// # Example
+    ///
+    /// Let's say player has to move with a speed of `50`.
+    /// The calculation for the movement  `50 * delta_time`.
+    pub fn delta_time(&self) -> f32 {
+        self.delta_time
+    }
+
+    /// The component will be added after the current frame ends and before the next one begins.
+    pub fn add_component(&mut self, name: String, component: Component) {
+        let old_component = self.components_to_add.insert(name, component);
+        wasm_assert!(old_component.is_none())
+    }
+
+    /// The component will be removed after the current frame ends and before the next one begins.
+    pub fn remove_component(&mut self, name: String) {
+        info!("Removing {}", name);
+        let is_new = self.components_to_remove.insert(name);
+        wasm_assert!(is_new)
     }
 }
 
+/// This is a separate `State` struct as opposed to flattening its fields in the `Engine` struct
+/// because the `State` data crosses the WASM/JS boundary, so it needs to be memory managed from
+/// behind an `Rc`. It's a lot more ergonomic to use the `Rc` once on the entire shared state as
+/// opposed to repeating it for each field.
 struct State {
     canvas: Canvas,
-    components: RefCell<Vec<Component>>,
+    components: RefCell<HashMap<String, Component>>,
     input: RefCell<Input>,
     last_time: RefCell<SystemTime>,
 }
 
+/// # Example
+///
+/// ```rust
+/// use std::collections::HashMap;
+/// use twors::{Engine, Result};
+/// use wasm_bindgen::prelude::wasm_bindgen;
+///
+/// // Make sure to check the "Installation and build" guide on how to call the "entry" function
+/// // from JS
+/// #[wasm_bindgen]
+/// pub fn entry(canvas_id: &str) -> Result<()> {
+///     console_log::init().unwrap(); // Setup logging for the browser console
+///
+///     let mut components = HashMap::default(); // Add custom components to this map
+///     let engine = Engine::new(canvas_id, components)?;
+///     engine.run()?;
+///
+///     Ok(())
+/// }
+/// ```
 pub struct Engine {
     window: Rc<Window>,
     state: Rc<State>,
 }
 
 impl Engine {
-    pub fn new(canvas_id: &str, components: Vec<Component>) -> Result<Self> {
+    pub fn new(canvas_id: &str, components: HashMap<String, Component>) -> Result<Self> {
         let not_found_msg = |entity: &str| format!("Did not find '{}'", entity);
         let window = web_sys::window().ok_or_else(|| not_found_msg("window"))?;
 
@@ -89,11 +154,11 @@ impl Engine {
     }
 
     fn init_components(&self) {
-        let ctx = Context::new(&self.state.canvas, self.state.input.borrow(), 0.0);
-        for component in self.state.components.borrow_mut().iter_mut() {
+        let mut ctx = Context::new(self.state.input.borrow(), 0.0);
+        for (_, component) in self.state.components.borrow_mut().iter_mut() {
             let logic = component.logic.as_mut();
             let transform = &mut component.transform;
-            logic.on_init(&ctx, transform);
+            logic.on_init(&mut ctx, transform);
         }
     }
 
@@ -107,8 +172,12 @@ impl Engine {
         // mutable borrow afterwards.
         {
             let delta_time = Engine::calc_delta_and_update_last(state.last_time.borrow_mut());
-            let ctx = Context::new(&state.canvas, state.input.borrow(), delta_time);
-            Engine::update_components(state.components.borrow_mut(), &ctx);
+            let mut ctx = Context::new(state.input.borrow(), delta_time);
+            let mut components = state.components.borrow_mut();
+
+            Engine::update_components(&mut components, &mut ctx, state.canvas.context());
+            Engine::add_components(&mut components, ctx.components_to_add);
+            Engine::remove_components(&mut components, ctx.components_to_remove);
         }
 
         state.input.borrow_mut().transition_states();
@@ -125,21 +194,44 @@ impl Engine {
         delta_time
     }
 
-    fn update_components(mut components: RefMut<Vec<Component>>, ctx: &Context) {
+    fn update_components(
+        components: &mut HashMap<String, Component>,
+        ctx: &mut Context,
+        render_ctx: &CanvasRenderingContext2d,
+    ) {
         // Update
-        for component in components.iter_mut() {
+        for (_, component) in components.iter_mut() {
             let logic = component.logic.as_mut();
             let transform = &mut component.transform;
             logic.on_update(ctx, transform);
         }
 
         // Render
-        let render_ctx = ctx.render_ctx(); // Cache to avoid crossing WASM boundary unnecessarily.
-        for component in components.iter() {
+        for (_, component) in components.iter() {
             for renderable in &component.renderables {
                 renderer::render(render_ctx, &renderable.vertices, &component.transform);
                 (renderable.style)(render_ctx);
             }
+        }
+    }
+
+    fn add_components(
+        components: &mut HashMap<String, Component>,
+        components_to_add: HashMap<String, Component>,
+    ) {
+        for (name, cmp) in components_to_add {
+            let old_cmp = components.insert(name, cmp);
+            wasm_assert!(old_cmp.is_none())
+        }
+    }
+
+    fn remove_components(
+        components: &mut HashMap<String, Component>,
+        components_to_remove: HashSet<String>,
+    ) {
+        for name in components_to_remove {
+            let removed = components.remove(&name);
+            wasm_assert!(removed.is_some());
         }
     }
 }

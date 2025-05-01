@@ -38,7 +38,7 @@ cargo make watch # this assumes you have the `cp` command - e.g. it won't work i
 # edit the source code in examples/playground and manually refresh http://localhost:8080
 ```
 
-- To add `twors` to your own crate - check out the [Installation and build](#-installation-and-build) guide
+- To add `twors` to your own crate - check out the [Installation and build](#%EF%B8%8F-installation-and-build) guide
 
 ## ✨ Features
 
@@ -53,7 +53,7 @@ cargo make watch # this assumes you have the `cp` command - e.g. it won't work i
     - [x] Translation & scale
     - [ ] Rotation
     - [ ] Inheritance (so a component moves with its parent)
-  - [ ] Dynamic component instantiation and removal
+  - [x] Dynamic component instantiation and removal
   - [ ] Interacting with components from other components via `get_component_by_id` 
 - [ ] Rectangle-based 2D collision detection
 - [ ] Utilities
@@ -135,6 +135,7 @@ cargo add console_log
 ```rust
 use twors::{Engine, Result};
 use wasm_bindgen::prelude::wasm_bindgen;
+use std::collections::HashMap;
 use console_log;
 
 // The "wasm_bindgen" attribute will generate glue both on the JS and on the WASM sides.
@@ -145,7 +146,7 @@ pub fn entry(canvas_id: &str) -> Result<()> {
 
     // Pass a list of components to render on the canvas.
     // We'll add an index.html file with said canvas later.
-    let engine = Engine::new(canvas_id, Vec::default())?;
+    let engine = Engine::new(canvas_id, HashMap::default())?;
     engine.run()?;
 
     Ok(())
