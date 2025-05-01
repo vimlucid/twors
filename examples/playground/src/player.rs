@@ -1,4 +1,4 @@
-use twors::{Component, EngineContext, Key, Logic, Renderable, Transform, Vertex2, shape_factory};
+use twors::{Component, Context, Key, Logic, Renderable, Transform, Vertex2, shape_factory};
 use web_sys::CanvasRenderingContext2d;
 
 pub fn new() -> Component {
@@ -24,13 +24,9 @@ const SPEED: f32 = 100.0;
 struct PlayerLogic {}
 
 impl Logic for PlayerLogic {
-    fn on_update(&mut self, ctx: &EngineContext, transform: &mut Transform) {
-        self.walk(ctx, transform);
-    }
-}
+    fn on_init(&mut self, _: &Context, _: &mut Transform) {}
 
-impl PlayerLogic {
-    pub fn walk(&mut self, ctx: &EngineContext, transform: &mut Transform) {
+    fn on_update(&mut self, ctx: &Context, transform: &mut Transform) {
         if ctx.input.keyboard.is_down(Key::A) {
             transform.position += Vertex2 {
                 x: -SPEED * ctx.delta_time,

@@ -75,7 +75,7 @@ pub mod shape_factory;
 
 pub use canvas::Canvas;
 pub use engine::{
-    Engine, EngineContext,
+    Context, Engine,
     component::{Component, Logic, Renderable, Transform},
     input::{Key, Mouse},
 };

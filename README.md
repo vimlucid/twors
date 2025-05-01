@@ -49,10 +49,15 @@ handling - there are two ways to run it:
 - [x] Adaptive canvas resolution on resize
 - [x] Delta time
 - [x] Keyboard and mouse input handling
-- [ ] Component system (with `init()` and `update()` lifecycle methods)
-- [ ] Transform (with inheritance) - translate, scale
+- [ ] Component system
+  - [x] `init()` and `update()` lifecycle methods
+  - [ ] Dynamic instantiation/removal
+  - [ ] Interaction with other components (e.g. via `get_component_by_id`)
+- [ ] Transform (with optional parent transform inheritance) - translation, rotation, scale
 - [ ] Collision detection
-- [ ] Bezier curves
+- [ ] Utilities
+  - [ ] Bezier curves
+  - [ ] Linear & smooth interpolation
 - [ ] Benchmark
 
 ## &#x1F4BB; Development

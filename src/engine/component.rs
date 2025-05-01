@@ -1,9 +1,10 @@
-use super::EngineContext;
+use super::Context;
 use crate::Vertex2;
 use web_sys::CanvasRenderingContext2d;
 
 const DEFAULT_SCALE: Vertex2<f32> = const { Vertex2::new(1.0, 1.0) };
 
+#[derive(Debug)]
 pub struct Transform {
     pub position: Vertex2<f32>,
     pub scale: Vertex2<f32>,
@@ -33,7 +34,8 @@ pub struct Renderable {
 }
 
 pub trait Logic {
-    fn on_update(&mut self, ctx: &EngineContext, transform: &mut Transform);
+    fn on_init(&mut self, ctx: &Context, transform: &mut Transform);
+    fn on_update(&mut self, ctx: &Context, transform: &mut Transform);
 }
 
 pub struct Component {

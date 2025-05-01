@@ -8,19 +8,34 @@ use crate::{Canvas, Vertex2, error::Result};
 use component::Component;
 use input::Input;
 use std::{
-    cell::{RefCell, RefMut},
+    cell::{Ref, RefCell, RefMut},
     rc::Rc,
 };
 use web_sys::{CanvasRenderingContext2d, Window};
 use web_time::{Duration, SystemTime};
 
-pub struct EngineContext<'a> {
-    pub render_ctx: &'a CanvasRenderingContext2d,
+pub struct Context<'a> {
     pub delta_time: f32,
-    pub input: &'a Input,
+    pub input: Ref<'a, Input>,
+
+    canvas: &'a Canvas,
 }
 
-struct EngineState {
+impl<'a> Context<'a> {
+    pub fn new(canvas: &'a Canvas, input: Ref<'a, Input>, delta_time: f32) -> Self {
+        Self {
+            canvas,
+            input,
+            delta_time,
+        }
+    }
+
+    pub fn render_ctx(&self) -> &CanvasRenderingContext2d {
+        self.canvas.context()
+    }
+}
+
+struct State {
     canvas: Canvas,
     components: RefCell<Vec<Component>>,
     input: RefCell<Input>,
@@ -30,7 +45,7 @@ struct EngineState {
 // TODO: Two Rcs? What's the criteria for what goes into the engine state and what out of it?
 pub struct Engine {
     window: Rc<Window>,
-    state: Rc<EngineState>,
+    state: Rc<State>,
 }
 
 impl Engine {
@@ -49,7 +64,7 @@ impl Engine {
         let input = Input::default();
         input.init(&window)?;
 
-        let state = EngineState {
+        let state = State {
             canvas,
             components: RefCell::new(components),
             input: RefCell::new(input),
@@ -66,67 +81,69 @@ impl Engine {
         let state = self.state.clone();
         let window = self.window.clone();
 
+        // Scope the immutable input borrow to avoid crashing on the
+        // mutable borrow afterwards.
+        {
+            let ctx = Context::new(&state.canvas, state.input.borrow(), 0.0);
+            Engine::init_components(state.components.borrow_mut(), &ctx);
+        }
+
         animation_frame::request_recursive(
             self.window.clone(),
             Rc::new(move || {
-                let elapsed = state
-                    .last_time
-                    .borrow()
-                    .elapsed()
-                    .unwrap_or_else(|_| Duration::default());
-                *state.last_time.borrow_mut() = SystemTime::now();
-
-                state.canvas.clear();
-
                 // TODO: Resize on resize event to avoid WASM boundary crossing on the hot path
                 let window_size = get_window_inner_size(&window)?;
                 state.canvas.resize(window_size);
+                state.canvas.clear();
 
-                let mut input = state.input.borrow_mut();
+                // Scope the immutable input borrow to avoid crashing on the
+                // mutable borrow afterwards.
+                {
+                    let delta_time =
+                        Engine::calc_delta_and_update_last(state.last_time.borrow_mut());
+                    let ctx = Context::new(&state.canvas, state.input.borrow(), delta_time);
+                    Engine::update_components(state.components.borrow_mut(), &ctx);
+                }
 
-                let ctx = {
-                    let delta_time = elapsed.as_millis() as f32 / 1000.0;
-                    EngineContext {
-                        render_ctx: state.canvas.context(),
-                        delta_time,
-                        input: &input,
-                    }
-                };
-
-                Engine::handle_components(state.components.borrow_mut(), &ctx);
-
-                input.transition_states();
+                state.input.borrow_mut().transition_states();
 
                 Ok(())
             }),
         )
     }
 
-    fn handle_components(mut components: RefMut<Vec<Component>>, ctx: &EngineContext) {
-        {
-            let mut components = components.iter_mut().collect::<Vec<&mut Component>>();
-            Engine::update_components(components.as_mut_slice(), ctx);
-        }
+    fn calc_delta_and_update_last(mut last_time: RefMut<SystemTime>) -> f32 {
+        let elapsed = last_time.elapsed().unwrap_or_else(|_| Duration::default());
+        let delta_time = elapsed.as_millis() as f32 / 1000.0;
 
-        {
-            let components = components.iter().collect::<Vec<&Component>>();
-            Engine::render_components(components.as_slice(), ctx.render_ctx);
+        *last_time = SystemTime::now();
+
+        delta_time
+    }
+
+    fn init_components(mut components: RefMut<Vec<Component>>, ctx: &Context) {
+        let components = components.iter_mut().collect::<Vec<&mut Component>>();
+        for component in components {
+            let logic = component.logic.as_mut();
+            let transform = &mut component.transform;
+            logic.on_init(ctx, transform);
         }
     }
 
-    fn update_components(components: &mut [&mut Component], ctx: &EngineContext) {
-        for component in components {
+    fn update_components(mut components: RefMut<Vec<Component>>, ctx: &Context) {
+        // Update
+        for component in components.iter_mut() {
             let logic = component.logic.as_mut();
             let transform = &mut component.transform;
             logic.on_update(ctx, transform);
         }
-    }
 
-    fn render_components(components: &[&Component], ctx: &CanvasRenderingContext2d) {
-        for component in components {
+        // Render
+        let render_ctx = ctx.render_ctx(); // Cache to avoid crossing WASM boundary unnecessarily.
+        for component in components.iter() {
             for renderable in &component.renderables {
-                renderer::render(ctx, &renderable.vertices, &component.transform);
-                (renderable.style)(ctx);
+                renderer::render(render_ctx, &renderable.vertices, &component.transform);
+                (renderable.style)(render_ctx);
             }
         }
     }
