@@ -1,7 +1,5 @@
 use std::ops::{Add, AddAssign, Mul, SubAssign};
 
-// TODO: Unit tests
-
 #[derive(Debug, PartialEq, Copy, Clone, Default)]
 pub struct Vertex2<T> {
     pub x: T,

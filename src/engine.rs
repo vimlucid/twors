@@ -1,10 +1,11 @@
 mod animation_frame;
+mod canvas;
 mod renderer;
 
 pub mod component;
 pub mod input;
 
-use crate::{Canvas, Vertex2, error::Result};
+use crate::{Vertex2, engine::canvas::Canvas, error::Result};
 use component::Component;
 use input::Input;
 use std::{
@@ -42,7 +43,6 @@ struct State {
     last_time: RefCell<SystemTime>,
 }
 
-// TODO: Two Rcs? What's the criteria for what goes into the engine state and what out of it?
 pub struct Engine {
     window: Rc<Window>,
     state: Rc<State>,
@@ -78,38 +78,42 @@ impl Engine {
     }
 
     pub fn run(&self) -> Result<()> {
-        let state = self.state.clone();
+        self.init_components();
+
         let window = self.window.clone();
+        let state = self.state.clone();
+        animation_frame::request_recursive(
+            self.window.clone(),
+            Rc::new(move || Engine::main_loop(state.clone(), &window)),
+        )
+    }
+
+    fn init_components(&self) {
+        let ctx = Context::new(&self.state.canvas, self.state.input.borrow(), 0.0);
+        for component in self.state.components.borrow_mut().iter_mut() {
+            let logic = component.logic.as_mut();
+            let transform = &mut component.transform;
+            logic.on_init(&ctx, transform);
+        }
+    }
+
+    fn main_loop(state: Rc<State>, window: &Window) -> Result<()> {
+        // TODO: Resize on resize event to avoid WASM boundary crossing on the hot path
+        let window_size = get_window_inner_size(window)?;
+        state.canvas.resize(window_size);
+        state.canvas.clear();
 
         // Scope the immutable input borrow to avoid crashing on the
         // mutable borrow afterwards.
         {
-            let ctx = Context::new(&state.canvas, state.input.borrow(), 0.0);
-            Engine::init_components(state.components.borrow_mut(), &ctx);
+            let delta_time = Engine::calc_delta_and_update_last(state.last_time.borrow_mut());
+            let ctx = Context::new(&state.canvas, state.input.borrow(), delta_time);
+            Engine::update_components(state.components.borrow_mut(), &ctx);
         }
 
-        animation_frame::request_recursive(
-            self.window.clone(),
-            Rc::new(move || {
-                // TODO: Resize on resize event to avoid WASM boundary crossing on the hot path
-                let window_size = get_window_inner_size(&window)?;
-                state.canvas.resize(window_size);
-                state.canvas.clear();
+        state.input.borrow_mut().transition_states();
 
-                // Scope the immutable input borrow to avoid crashing on the
-                // mutable borrow afterwards.
-                {
-                    let delta_time =
-                        Engine::calc_delta_and_update_last(state.last_time.borrow_mut());
-                    let ctx = Context::new(&state.canvas, state.input.borrow(), delta_time);
-                    Engine::update_components(state.components.borrow_mut(), &ctx);
-                }
-
-                state.input.borrow_mut().transition_states();
-
-                Ok(())
-            }),
-        )
+        Ok(())
     }
 
     fn calc_delta_and_update_last(mut last_time: RefMut<SystemTime>) -> f32 {
@@ -119,15 +123,6 @@ impl Engine {
         *last_time = SystemTime::now();
 
         delta_time
-    }
-
-    fn init_components(mut components: RefMut<Vec<Component>>, ctx: &Context) {
-        let components = components.iter_mut().collect::<Vec<&mut Component>>();
-        for component in components {
-            let logic = component.logic.as_mut();
-            let transform = &mut component.transform;
-            logic.on_init(ctx, transform);
-        }
     }
 
     fn update_components(mut components: RefMut<Vec<Component>>, ctx: &Context) {

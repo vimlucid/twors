@@ -121,7 +121,7 @@ pub enum Button {
 
 impl Button {
     /// Accepted key codes are a partial subset from
-    /// https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values
+    /// <https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values>
     pub fn new(key_code: &str) -> Result<Button> {
         match key_code {
             "ArrowDown" => Ok(Button::ArrowDown),

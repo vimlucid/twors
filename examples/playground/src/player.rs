@@ -1,5 +1,4 @@
-use twors::{Component, Context, Key, Logic, Renderable, Transform, Vertex2, shape_factory};
-use web_sys::CanvasRenderingContext2d;
+use twors::{prelude::*, shape_factory};
 
 pub fn new() -> Component {
     Component {

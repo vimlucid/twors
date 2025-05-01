@@ -9,6 +9,7 @@ pub fn request_recursive(
     window: Rc<Window>,
     callback: Rc<RequestAnimationFrameCallback>,
 ) -> Result<()> {
+    // https://rustwasm.github.io/wasm-bindgen/examples/request-animation-frame.html
     let callback_ref_alpha = Rc::new(RefCell::new(None));
     let callback_ref_beta = callback_ref_alpha.clone();
 

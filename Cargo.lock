@@ -117,6 +117,7 @@ dependencies = [
 name = "twors"
 version = "0.2.0"
 dependencies = [
+ "console_log",
  "log",
  "thiserror",
  "wasm-bindgen",
