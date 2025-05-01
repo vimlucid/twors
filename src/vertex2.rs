@@ -61,3 +61,38 @@ where
         self.y -= rhs.y;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new() {
+        let vertex = Vertex2::new(1.0, 2.0);
+        assert_eq!(vertex.x, 1.0);
+        assert_eq!(vertex.y, 2.0)
+    }
+
+    #[test]
+    fn mul() {
+        let vertex = Vertex2::new(1.5, 2.0) * Vertex2::new(2.0, 3.0);
+        assert_eq!(vertex.x, 3.0);
+        assert_eq!(vertex.y, 6.0)
+    }
+
+    #[test]
+    fn add_assign() {
+        let mut vertex = Vertex2::new(1.0, 2.0);
+        vertex += Vertex2::new(3.0, 4.0);
+        assert_eq!(vertex.x, 4.0);
+        assert_eq!(vertex.y, 6.0)
+    }
+
+    #[test]
+    fn sub_assign() {
+        let mut vertex = Vertex2::new(1.0, 2.0);
+        vertex -= Vertex2::new(3.0, 1.0);
+        assert_eq!(vertex.x, -2.0);
+        assert_eq!(vertex.y, 1.0)
+    }
+}

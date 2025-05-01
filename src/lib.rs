@@ -61,8 +61,8 @@
 //! the `Mouse` and `Key` enums to check for a key's state.
 //!
 //! ```rust
-//! ctx.input.mouse.is_pressed(Mouse::Main)
-//! ctx.input.keyboard.is_pressed(Key::A)
+//! ctx.input.mouse.is_pressed(Mouse::Main);
+//! ctx.input.keyboard.is_pressed(Key::A);
 //! ```
 
 mod canvas;
