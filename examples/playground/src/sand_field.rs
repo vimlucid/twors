@@ -57,6 +57,7 @@ impl SandField {
 
             transform: Transform::from_position(Vertex2::new(250.0, 250.0)),
             renderables: vec![Renderable {
+                transform: Transform::default(),
                 vertices: shape_factory::square(SIZE),
                 style: |ctx: &CanvasRenderingContext2d| {
                     ctx.set_fill_style_str("yellow");

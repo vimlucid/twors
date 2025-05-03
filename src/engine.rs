@@ -194,7 +194,8 @@ impl Engine {
                 .iter()
                 .filter(|renderable| renderable.layer == layer)
             {
-                renderer::render(render_ctx, &renderable.vertices, component.transform());
+                let transform = component.transform().clone() + &renderable.transform;
+                renderer::render(render_ctx, &renderable.vertices, &transform);
                 (renderable.style)(render_ctx);
             }
         }

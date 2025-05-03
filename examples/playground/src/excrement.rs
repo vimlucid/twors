@@ -10,6 +10,7 @@ impl Excrement {
         Self {
             transform: Transform::from_position(position),
             renderables: vec![Renderable {
+                transform: Transform::default(),
                 vertices: shape_factory::square(10.0),
                 style: |ctx: &CanvasRenderingContext2d| {
                     ctx.set_fill_style_str("brown");

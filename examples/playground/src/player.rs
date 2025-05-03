@@ -1,4 +1,7 @@
-use twors::{prelude::*, shape_factory};
+mod eye;
+mod head;
+
+use twors::prelude::*;
 
 pub const SIZE: f32 = 30.0;
 
@@ -13,17 +16,11 @@ impl Player {
     pub fn new() -> Self {
         Self {
             transform: Transform::default(),
-            renderables: vec![Renderable {
-                vertices: shape_factory::square(SIZE),
-                style: |ctx: &CanvasRenderingContext2d| {
-                    ctx.set_fill_style_str("red");
-                    ctx.set_line_width(1.0);
-                    ctx.set_stroke_style_str("black");
-                    ctx.stroke();
-                    ctx.fill();
-                },
-                layer: twors::Layer::One,
-            }],
+            renderables: vec![
+                head::new(),
+                eye::new(Vertex2::new(-8.0, -8.0)),
+                eye::new(Vertex2::new(8.0, -8.0)),
+            ],
         }
     }
 }
@@ -38,19 +35,6 @@ impl Component for Player {
     }
 
     fn update(&mut self, ctx: &mut Context) {
-        if ctx.input.mouse.is_pressed(Mouse::LMB) {
-            // let last_id = self.next_id + 1;
-            // self.next_id += 1;
-
-            // ctx.add_component(last_id, excrement::new(transform.position));
-        }
-
-        if ctx.input.mouse.is_released(Mouse::RMB) {
-            // if let Some(prev_excrement_id) = self.decrement_next_excrement_id() {
-            //     ctx.remove_component(prev_excrement_id);
-            // }
-        }
-
         if ctx.input.keyboard.is_down(Key::A) {
             self.transform.position += Vertex2 {
                 x: -SPEED * ctx.delta_time(),
