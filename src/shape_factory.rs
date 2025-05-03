@@ -5,22 +5,24 @@ pub fn square(size: f32) -> Vec<Vertex2<f32>> {
 }
 
 pub fn rectangle(width: f32, height: f32) -> Vec<Vertex2<f32>> {
+    let half_width = width / 2.0;
+    let half_height = height / 2.0;
     vec![
         Vertex2 {
-            x: -width,
-            y: -height,
+            x: -half_width,
+            y: -half_height,
         },
         Vertex2 {
-            x: width,
-            y: -height,
+            x: half_width,
+            y: -half_height,
         },
         Vertex2 {
-            x: width,
-            y: height,
+            x: half_width,
+            y: half_height,
         },
         Vertex2 {
-            x: -width,
-            y: height,
+            x: -half_width,
+            y: half_height,
         },
     ]
 }

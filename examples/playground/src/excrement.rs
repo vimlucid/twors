@@ -1,6 +1,6 @@
 use twors::{prelude::*, shape_factory};
 
-struct Excrement {
+pub struct Excrement {
     transform: Transform,
     renderables: Vec<Renderable>,
 }

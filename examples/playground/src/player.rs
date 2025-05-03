@@ -1,22 +1,20 @@
 use twors::{prelude::*, shape_factory};
 
-const SPEED: f32 = 250.0;
+pub const SIZE: f32 = 30.0;
+
+const SPEED: f32 = 200.0;
 
 pub struct Player {
-    next_id: usize,
-
-    transform: Transform,
+    pub transform: Transform,
     renderables: Vec<Renderable>,
 }
 
 impl Player {
     pub fn new() -> Self {
         Self {
-            next_id: 0,
-
-            transform: Transform::from_position(Vertex2::new(300.0, 200.0)),
+            transform: Transform::default(),
             renderables: vec![Renderable {
-                vertices: shape_factory::square(30.0),
+                vertices: shape_factory::square(SIZE),
                 style: |ctx: &CanvasRenderingContext2d| {
                     ctx.set_fill_style_str("red");
                     ctx.set_line_width(1.0);

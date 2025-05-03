@@ -138,8 +138,9 @@ impl Engine {
             let mut components = state.components.borrow_mut();
             let mut components: Vec<&mut dyn Component> =
                 components.iter_mut().map(|cmp| cmp.as_mut() as _).collect();
+            Engine::update_components(components.as_mut_slice(), &mut ctx);
 
-            Engine::update_components(components.as_mut_slice(), &mut ctx, state.canvas.context());
+            Engine::render_components(components.as_mut_slice(), state.canvas.context());
         }
 
         state.input.borrow_mut().transition_states();
@@ -156,25 +157,35 @@ impl Engine {
         delta_time
     }
 
-    fn update_components(
-        components: &mut [&mut dyn Component],
-        ctx: &mut Context,
-        render_ctx: &CanvasRenderingContext2d,
-    ) {
-        // Update
+    fn update_components(components: &mut [&mut dyn Component], ctx: &mut Context) {
+        // Children must be updated first so that parent components can have the final say in the
+        // children's state (since the parents are responsible for the management).
+        // Otherwise a child's state in the current frame can get modified by the parent state in
+        // the next frame and we would get jittery movement.
         for component in components.iter_mut() {
-            component.on_update(ctx);
-
             let mut children = component.get_children();
-            Engine::update_components(children.as_mut_slice(), ctx, render_ctx);
+            Engine::update_components(children.as_mut_slice(), ctx);
         }
 
-        // Render
+        for component in components.iter_mut() {
+            component.on_update(ctx);
+        }
+    }
+
+    fn render_components(
+        components: &mut [&mut dyn Component],
+        render_ctx: &CanvasRenderingContext2d,
+    ) {
         for component in components.iter() {
             for renderable in component.renderables() {
                 renderer::render(render_ctx, &renderable.vertices, component.transform());
                 (renderable.style)(render_ctx);
             }
+        }
+
+        for component in components.iter_mut() {
+            let mut children = component.get_children();
+            Engine::render_components(children.as_mut_slice(), render_ctx);
         }
     }
 }

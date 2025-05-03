@@ -5,6 +5,7 @@ mod error;
 mod vertex2;
 mod wasm_assert;
 
+pub mod dimensions;
 pub mod prelude;
 pub mod shape_factory;
 
