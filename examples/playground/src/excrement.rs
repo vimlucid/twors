@@ -1,27 +1,40 @@
 use twors::{prelude::*, shape_factory};
 
-pub fn new(position: Vertex2<f32>) -> Component {
-    Component {
-        transform: Transform::from_position(position),
-        renderables: vec![Renderable {
-            vertices: shape_factory::square(10.0),
-            style: |ctx: &CanvasRenderingContext2d| {
-                ctx.set_fill_style_str("brown");
-                ctx.set_line_width(1.0);
-                ctx.set_stroke_style_str("black");
-                ctx.stroke();
-                ctx.fill();
-            },
-        }],
-        logic: Box::new(ExcrementLogic::default()),
+struct Excrement {
+    transform: Transform,
+    renderables: Vec<Renderable>,
+}
+
+impl Excrement {
+    pub fn new(position: Vertex2<f32>) -> Self {
+        Self {
+            transform: Transform::from_position(position),
+            renderables: vec![Renderable {
+                vertices: shape_factory::square(10.0),
+                style: |ctx: &CanvasRenderingContext2d| {
+                    ctx.set_fill_style_str("brown");
+                    ctx.set_line_width(1.0);
+                    ctx.set_stroke_style_str("black");
+                    ctx.stroke();
+                    ctx.fill();
+                },
+            }],
+        }
     }
 }
 
-#[derive(Default)]
-struct ExcrementLogic {}
+impl Component for Excrement {
+    fn transform(&self) -> &Transform {
+        &self.transform
+    }
 
-impl Logic for ExcrementLogic {
-    fn on_init(&mut self, _: &mut Context, _: &mut Transform) {}
+    fn renderables(&self) -> &[Renderable] {
+        &self.renderables
+    }
 
-    fn on_update(&mut self, _: &mut Context, _: &mut Transform) {}
+    fn on_update(&mut self, _: &mut Context) {}
+
+    fn get_children(&mut self) -> Vec<&mut dyn Component> {
+        Vec::default()
+    }
 }

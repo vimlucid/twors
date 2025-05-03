@@ -10,7 +10,7 @@ pub mod shape_factory;
 
 pub use engine::{
     Context, Engine,
-    component::{Component, Logic, Renderable, Transform},
+    component::{Component, Renderable, Transform},
     input::{Key, Mouse},
 };
 pub use error::{Error, Result};

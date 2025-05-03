@@ -124,7 +124,7 @@ pub fn entry(canvas_id: &str) -> Result<()> {
 
     // Pass a list of components to render on the canvas.
     // We'll add an index.html file with said canvas later.
-    let engine = Engine::new(canvas_id, HashMap::default())?;
+    let engine = Engine::new(canvas_id, Vec::default())?;
     engine.run()?;
 
     Ok(())
