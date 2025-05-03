@@ -44,44 +44,22 @@ cargo make watch # this assumes you have the `cp` command - e.g. it won't work i
 
 ✅ `TwoRS`'s goal is to be simple. It aims to provide:
 
-- [x] An adaptive canvas resolution (on canvas resize)
-- [x] A main loop with precalculated [delta time](https://en.wikipedia.org/wiki/Delta_timing)
-- [x] Keyboard/mouse input handling
-- [ ] A convenient component system for code organization
-  - [x] Basic component support with `on_init` and `on_update` lifecycle methods
-  - [ ] Transform
-    - [x] Translation & scale
-    - [ ] Rotation
-    - [ ] Inheritance (so a component moves with its parent)
-  - [x] Dynamic component instantiation and removal
-  - [ ] Interacting with components from other components via `get_component_by_id` 
-- [ ] Rectangle-based 2D collision detection
-- [ ] Utilities
-  - [ ] Linear/smooth interpolation (for animations over time)
-  - [ ] Bezier curves
-  - [ ] Factories for various shapes & styling
-    - [x] Square & rectangle
-    - [ ] ...
-- [ ] Benchmark
+- ✅ A main loop with precalculated [delta time](https://en.wikipedia.org/wiki/Delta_timing)
+- ✅ Keyboard/mouse
+- 🔄 Component system
+- ✔️ Rectangle-based 2D collision detection
+- 🔄 Utilities
+  - ✔️ Linear/smooth interpolation (for animations over time)
+  - ✔️ Bezier curves
+  - 🔄 Factories for various shapes & styling
+- ✔️ Benchmark
 
 ❌ `TwoRS` does not **currently** have (and aim) to provide:
 
 - a physics engine
 - an algorithm library (e.g. pathfinding)
 - a sound library
-- 🎨 **\*a UI library** (check the note below)
-
-🎨 **\* a UI library**
-- If your project requirements allow it you can implement your UI in Rust via framework like
-  [Dioxus](https://dioxuslabs.com/), [Leptos](https://leptos.dev/),
-  [Sycamore](https://github.com/sycamore-rs/sycamore) and [Yew](https://yew.rs/) to name a few.
-  - These, however, are the Rust analog to JS frameworks like React - they **will not allow you
-    to create a UI that's rendered directly in the canvas**. If the UI can live in the DOM then
-    they are a great choice!
-- Still - UI is an important part of any application and not having support for canvas UI might
-  be a dealbreaker. I might open source another library (based on this one) for simple canvas UI
-  support after I am done with the initial feature set of `TwoRS`
-
+- a UI library
 
 ## 🛠️ Installation and build
 
