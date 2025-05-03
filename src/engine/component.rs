@@ -39,32 +39,23 @@ impl Default for Transform {
 /// The `style` field is a function pointer with a 2D canvas context as an argument - simply
 /// use the canvas API to style the vertices that were passed to the `vertices` field.
 ///
+/// The renderables are part of a [Component](Component)
+///
 /// # Example
 /// ```rust
 /// use twors::{prelude::*, shape_factory};
 ///
-/// pub fn new() -> Component {
-///     Component {
-///         transform: Transform::from_position(Vertex2::new(300.0, 200.0)),
-///         renderables: vec![Renderable {
-///             vertices: shape_factory::square(30.0),
-///             style: |ctx: &CanvasRenderingContext2d| {
-///                 ctx.set_fill_style_str("red");
-///                 ctx.set_line_width(1.0);
-///                 ctx.set_stroke_style_str("black");
-///                 ctx.stroke();
-///                 ctx.fill();
-///             },
-///         }],
-///         logic: Box::new(ComponentLogic::default()),
+/// pub fn renderable() -> Renderable {
+///     Renderable {
+///         vertices: shape_factory::square(30.0),
+///         style: |ctx: &CanvasRenderingContext2d| {
+///             ctx.set_fill_style_str("red");
+///             ctx.set_line_width(1.0);
+///             ctx.set_stroke_style_str("black");
+///             ctx.stroke();
+///             ctx.fill();
+///         },
 ///     }
-/// }
-///
-/// #[derive(Default)]
-/// struct ComponentLogic;
-/// impl Logic for ComponentLogic {
-///     fn on_init(&mut self, _: &mut Context, _: &mut Transform) {}
-///     fn on_update(&mut self, _: &mut Context, _: &mut Transform) {}
 /// }
 /// ```
 pub struct Renderable {
@@ -72,11 +63,65 @@ pub struct Renderable {
     pub style: fn(&CanvasRenderingContext2d),
 }
 
+/// Implement this on a struct that will be responsible for managing your component's state
+/// and behavior.
+///
+/// You can then put an single instance of this struct into your custom component to define its
+/// behavior - see [Component](Component).
+///
+/// ```rust
+/// use twors::prelude::*;
+///
+/// struct MyComponentLogic {
+///     component_state: i32,
+/// }
+///
+/// impl Logic for MyComponentLogic {
+///     fn on_init(&mut self, _: &mut Context, _: &mut Transform) {
+///         self.component_state = 123;
+///     }
+///
+///     fn on_update(&mut self, _: &mut Context, _: &mut Transform) {
+///         self.component_state += 1;
+///     }
+/// }
+/// ```
+///
 pub trait Logic {
     fn on_init(&mut self, ctx: &mut Context, transform: &mut Transform);
     fn on_update(&mut self, ctx: &mut Context, transform: &mut Transform);
 }
 
+/// The core building block of any `TwoRS` application - everything starts with a component.
+/// - A component is something that may be visualized  and that has behavior.
+/// - Components go into the [Engine](super::Engine) list of components.
+///
+/// To construct a component the following will be needed:
+/// - `transform` - the components initial transform - see [Transform](Transform)
+/// - `renderables` - a list of definitions of how the component will look - all of them will be
+///   automatically rendered by the engine on each frame - see [Renderable](Renderable).
+/// - `logic` - the component's behavior **and state** - see [Logic](Logic).
+///
+/// ```rust
+/// use twors::prelude::*;
+///
+/// #[derive(Default)]
+/// struct MyComponentLogic;
+///
+/// impl Logic for MyComponentLogic {
+///     fn on_init(&mut self, _: &mut Context, _: &mut Transform) {}
+///     fn on_update(&mut self, _: &mut Context, _: &mut Transform) {}
+/// }
+///
+/// pub fn new() -> Component {
+///     Component {
+///         transform: Transform::default(),
+///         renderables: vec![],
+///         logic: Box::new(MyComponentLogic::default()),
+///     }
+/// }
+/// ```
+///
 pub struct Component {
     pub transform: Transform,
     pub renderables: Vec<Renderable>,

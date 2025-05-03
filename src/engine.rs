@@ -88,7 +88,9 @@ struct State {
     last_time: RefCell<SystemTime>,
 }
 
-/// # Example
+/// This is the entry point of our application - initialize a logger, pass a collection of
+/// components and run the engine.
+/// - See [Component](Component) for examples on a component definition.
 ///
 /// ```rust
 /// use std::collections::HashMap;
