@@ -11,7 +11,7 @@ pub mod shape_factory;
 
 pub use engine::{
     Context, Engine,
-    component::{Component, Renderable, Transform},
+    component::{Component, Layer, Renderable, Transform},
     input::{Key, Mouse},
 };
 pub use error::{Error, Result};

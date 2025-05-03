@@ -18,6 +18,7 @@ impl Excrement {
                     ctx.stroke();
                     ctx.fill();
                 },
+                layer: twors::Layer::Two,
             }],
         }
     }
@@ -32,9 +33,13 @@ impl Component for Excrement {
         &self.renderables
     }
 
-    fn on_update(&mut self, _: &mut Context) {}
+    fn update(&mut self, _: &mut Context) {}
 
-    fn get_children(&mut self) -> Vec<&mut dyn Component> {
+    fn children(&self) -> Vec<&dyn Component> {
+        Vec::default()
+    }
+
+    fn children_mut(&mut self) -> Vec<&mut dyn Component> {
         Vec::default()
     }
 }

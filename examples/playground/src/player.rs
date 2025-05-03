@@ -22,6 +22,7 @@ impl Player {
                     ctx.stroke();
                     ctx.fill();
                 },
+                layer: twors::Layer::One,
             }],
         }
     }
@@ -36,7 +37,7 @@ impl Component for Player {
         &self.renderables
     }
 
-    fn on_update(&mut self, ctx: &mut Context) {
+    fn update(&mut self, ctx: &mut Context) {
         if ctx.input.mouse.is_pressed(Mouse::LMB) {
             // let last_id = self.next_id + 1;
             // self.next_id += 1;
@@ -79,7 +80,11 @@ impl Component for Player {
         }
     }
 
-    fn get_children(&mut self) -> Vec<&mut dyn Component> {
+    fn children(&self) -> Vec<&dyn Component> {
+        Vec::default()
+    }
+
+    fn children_mut(&mut self) -> Vec<&mut dyn Component> {
         Vec::default()
     }
 }

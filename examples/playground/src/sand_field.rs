@@ -23,7 +23,7 @@ impl Component for SandField {
         &self.renderables
     }
 
-    fn on_update(&mut self, ctx: &mut Context) {
+    fn update(&mut self, ctx: &mut Context) {
         self.restrict_player_movement();
 
         if ctx.input.mouse.is_pressed(Mouse::LMB) {
@@ -32,7 +32,13 @@ impl Component for SandField {
         }
     }
 
-    fn get_children(&mut self) -> Vec<&mut dyn Component> {
+    fn children(&self) -> Vec<&dyn Component> {
+        let mut children = vec![&self.player as &dyn Component];
+        children.extend(self.excrements.iter().map(|cmp| cmp as &dyn Component));
+        children
+    }
+
+    fn children_mut(&mut self) -> Vec<&mut dyn Component> {
         let mut children = vec![&mut self.player as &mut dyn Component];
         children.extend(
             self.excrements
@@ -59,6 +65,7 @@ impl SandField {
                     ctx.stroke();
                     ctx.fill();
                 },
+                layer: twors::Layer::Five,
             }],
         }
     }

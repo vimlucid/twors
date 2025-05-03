@@ -30,16 +30,27 @@ impl Default for Transform {
     }
 }
 
+#[derive(Copy, Clone, Eq, PartialEq)]
+pub enum Layer {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+}
+
 pub struct Renderable {
     pub vertices: Vec<Vertex2<f32>>,
     pub style: fn(&CanvasRenderingContext2d),
+    pub layer: Layer,
 }
 
 pub trait Component {
     fn transform(&self) -> &Transform;
     fn renderables(&self) -> &[Renderable];
 
-    fn on_update(&mut self, ctx: &mut Context);
+    fn update(&mut self, ctx: &mut Context);
 
-    fn get_children(&mut self) -> Vec<&mut dyn Component>;
+    fn children(&self) -> Vec<&dyn Component>;
+    fn children_mut(&mut self) -> Vec<&mut dyn Component>;
 }

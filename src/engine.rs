@@ -5,7 +5,7 @@ mod renderer;
 pub mod component;
 pub mod input;
 
-use crate::{Vertex2, engine::canvas::Canvas, error::Result};
+use crate::{Layer, Vertex2, engine::canvas::Canvas, error::Result};
 use component::Component;
 use input::Input;
 use std::{
@@ -139,9 +139,12 @@ impl Engine {
             let mut components: Vec<&mut dyn Component> =
                 components.iter_mut().map(|cmp| cmp.as_mut() as _).collect();
             Engine::update_components(components.as_mut_slice(), &mut ctx);
-
-            Engine::render_components(components.as_mut_slice(), state.canvas.context());
         }
+
+        let components = state.components.borrow();
+        let components: Vec<&dyn Component> =
+            components.iter().map(|cmp| cmp.as_ref() as _).collect();
+        Engine::render_layers(components.as_slice(), state.canvas.context());
 
         state.input.borrow_mut().transition_states();
 
@@ -163,29 +166,43 @@ impl Engine {
         // Otherwise a child's state in the current frame can get modified by the parent state in
         // the next frame and we would get jittery movement.
         for component in components.iter_mut() {
-            let mut children = component.get_children();
+            let mut children = component.children_mut();
             Engine::update_components(children.as_mut_slice(), ctx);
         }
 
         for component in components.iter_mut() {
-            component.on_update(ctx);
+            component.update(ctx);
         }
     }
 
+    fn render_layers(components: &[&dyn Component], render_ctx: &CanvasRenderingContext2d) {
+        Engine::render_components(components, render_ctx, Layer::Five);
+        Engine::render_components(components, render_ctx, Layer::Four);
+        Engine::render_components(components, render_ctx, Layer::Three);
+        Engine::render_components(components, render_ctx, Layer::Two);
+        Engine::render_components(components, render_ctx, Layer::One);
+    }
+
     fn render_components(
-        components: &mut [&mut dyn Component],
+        components: &[&dyn Component],
         render_ctx: &CanvasRenderingContext2d,
+        layer: Layer,
     ) {
         for component in components.iter() {
-            for renderable in component.renderables() {
+            for renderable in component
+                .renderables()
+                .iter()
+                .filter(|renderable| renderable.layer == layer)
+            {
                 renderer::render(render_ctx, &renderable.vertices, component.transform());
                 (renderable.style)(render_ctx);
             }
         }
 
-        for component in components.iter_mut() {
-            let mut children = component.get_children();
-            Engine::render_components(children.as_mut_slice(), render_ctx);
+        for component in components.iter() {
+            let children = component.children();
+            let children: Vec<&dyn Component> = children.iter().map(|child| &**child).collect();
+            Engine::render_components(&children, render_ctx, layer);
         }
     }
 }
