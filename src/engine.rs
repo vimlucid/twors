@@ -15,11 +15,11 @@ use std::{
 use web_sys::{CanvasRenderingContext2d, Window};
 use web_time::{Duration, SystemTime}; // std::time::SystemTime panics in WASM
 
-/// The context is passed to the `on_init` and `on_update` component callbacks.
+/// The context is passed to the `update` callback of [Component](Component)
 ///
 /// It's use is to:
 /// - read mouse/keyboard inputs
-/// - add/remove components dynamically
+/// - provide the delta time value
 pub struct Context<'a> {
     pub input: Ref<'a, Input>,
 
@@ -40,7 +40,7 @@ impl<'a> Context<'a> {
     /// Any movement over time should be multiplied by the delta time - this way the speed will be
     /// the same across various hardware even if the FPS differs due to hardware capabilities.
     ///
-    /// # Example
+    /// ## Example
     ///
     /// Let's say player has to move with a speed of `50`.
     /// The calculation for the movement  `50 * delta_time`.
@@ -75,7 +75,8 @@ struct State {
 /// pub fn entry(canvas_id: &str) -> Result<()> {
 ///     console_log::init().unwrap(); // Setup logging for the browser console
 ///
-///     let engine = Engine::new(canvas_id, Vec::default())?;
+///     let components = Vec::default(); // Add components here
+///     let engine = Engine::new(canvas_id, components)?;
 ///     engine.run()?;
 ///
 ///     Ok(())
@@ -225,4 +226,12 @@ fn get_window_inner_size(window: &Window) -> Result<Vertex2<u32>> {
         x: width,
         y: height,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test() {
+        // TODO: Write tests
+    }
 }

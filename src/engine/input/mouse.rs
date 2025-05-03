@@ -7,6 +7,7 @@ use log::warn;
 use std::{cell::RefCell, rc::Rc};
 use web_sys::{MouseEvent, Window};
 
+/// Used in the `mouse` field in the [Input](super) module API
 #[derive(Eq, PartialEq, Hash, Clone, Copy)]
 #[repr(u8)]
 pub enum Button {

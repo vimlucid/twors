@@ -13,6 +13,9 @@ license = "MIT"
 keywords = ["game", "engine", "2d", "wasm", "canvas"]
 categories = ["wasm", "rendering::engine", "graphics", "web-programming", "game-engines"]
 
+# TODO: Exclude necessary files from packaging
+exclude = []
+
 [dependencies]
 # Public
 web-sys = { version = "0.3.77", features = ["CanvasRenderingContext2d", "Document", "Element", "HtmlCanvasElement", "KeyboardEvent", "MouseEvent", "Window"] }

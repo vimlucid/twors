@@ -183,7 +183,9 @@ miniserve ./pkg --index index.html
 
 ## 🧱 Fundamentals
 
-- TODO
+- A guide will be published once the API stabilizes.
+- In the meantime take a look at the [Engine](Engine) struct and drill down for details and
+  examples.
 
 ## 💻 Development
 

@@ -1,3 +1,5 @@
+//! Represents a 2D point in space.
+
 use std::ops::{Add, AddAssign, Mul, SubAssign};
 
 #[derive(Debug, PartialEq, Copy, Clone, Default)]
