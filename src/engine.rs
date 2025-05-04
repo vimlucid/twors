@@ -5,7 +5,7 @@ mod renderer;
 pub mod component;
 pub mod input;
 
-use crate::{Layer, Vertex2, engine::canvas::Canvas, error::Result};
+use crate::{Layer, Transform, Vertex2, engine::canvas::Canvas, error::Result};
 use component::Component;
 use input::Input;
 use std::{
@@ -177,25 +177,28 @@ impl Engine {
     }
 
     fn render_layers(components: &[&dyn Component], render_ctx: &CanvasRenderingContext2d) {
-        Engine::render_components(components, render_ctx, Layer::Five);
-        Engine::render_components(components, render_ctx, Layer::Four);
-        Engine::render_components(components, render_ctx, Layer::Three);
-        Engine::render_components(components, render_ctx, Layer::Two);
-        Engine::render_components(components, render_ctx, Layer::One);
+        Engine::render_components(components, render_ctx, Layer::Five, &Transform::default());
+        Engine::render_components(components, render_ctx, Layer::Four, &Transform::default());
+        Engine::render_components(components, render_ctx, Layer::Three, &Transform::default());
+        Engine::render_components(components, render_ctx, Layer::Two, &Transform::default());
+        Engine::render_components(components, render_ctx, Layer::One, &Transform::default());
     }
 
     fn render_components(
         components: &[&dyn Component],
         render_ctx: &CanvasRenderingContext2d,
         layer: Layer,
+        parent_transform: &Transform,
     ) {
         for component in components.iter() {
-            for renderable in component
+            let layer_filtered_renderables = component
                 .renderables()
                 .iter()
-                .filter(|renderable| renderable.layer == layer)
-            {
-                let transform = component.transform().clone() + &renderable.transform;
+                .filter(|renderable| renderable.layer == layer);
+
+            let renderable_parent_transform = parent_transform.clone() + component.transform();
+            for renderable in layer_filtered_renderables {
+                let transform = renderable_parent_transform.clone() + &renderable.transform;
                 renderer::render(render_ctx, &renderable.vertices, &transform);
                 (renderable.style)(render_ctx);
             }
@@ -204,7 +207,8 @@ impl Engine {
         for component in components.iter() {
             let children = component.children();
             let children: Vec<&dyn Component> = children.iter().map(|child| &**child).collect();
-            Engine::render_components(&children, render_ctx, layer);
+            let parent_transform = parent_transform.clone() + component.transform();
+            Engine::render_components(&children, render_ctx, layer, &parent_transform);
         }
     }
 }

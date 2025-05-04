@@ -1,3 +1,6 @@
+[config]
+default_to_workspace = false
+
 [env]
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
 
@@ -7,49 +10,41 @@ command = "cargo"
 args = ["fmt", "--", "--emit=files"]
 
 [tasks.clean]
-workspace = false
 command = "cargo"
 args = ["clean"]
 
 [tasks.build-git-hooks]
-workspace = false
 command = "cargo"
 args = ["build", "--bin", "pre-commit", "--release"]
 
 [tasks.install-git-hooks]
-workspace = false
 command = "git"
 args = ["config", "core.hooksPath", "target/release"]
 dependencies = ["build-git-hooks"]
 
 [tasks.build-wasm]
-workspace = false
 install_crate = { crate_name = "wasm-pack", binary = "wasm-pack", test_arg = "--help" }
 command = "wasm-pack"
 args = ["build", "--target", "web", "--out-dir", "../../target/pkg", "examples/playground"]
 dependencies = ["install-git-hooks"]
 
 [tasks.build]
-workspace = false
 command = "cp"
 args = ["examples/playground/assets/index.html", "target/pkg/"]
 dependencies = ["build-wasm"]
 
 [tasks.serve]
-workspace = false
 install_crate = { crate_name = "miniserve", binary = "miniserve", test_arg = "--help" }
 command = "miniserve"
 args = ["target/pkg", "--index", "index.html"]
 dependencies = ["build"]
 
 [tasks.watch]
-workspace = false
 install_crate = { crate_name = "bacon", binary = "bacon", test_arg = "--help" }
 command = "bacon"
 args = ["watch"]
 
 [tasks.licenses]
-workspace = false
 install_crate = { crate_name = "cargo-about", binary = "cargo-about", test_arg = "--help" }
 command = "cargo"
 args = [

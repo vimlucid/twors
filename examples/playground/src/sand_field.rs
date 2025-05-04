@@ -2,27 +2,24 @@ use crate::{
     excrement::Excrement,
     player::{self, Player},
 };
+use log::info;
 use twors::{dimensions::Dimensions, prelude::*, shape_factory};
 
 const SIZE: f32 = 400.0;
 
+#[derive(Component)]
 pub struct SandField {
+    #[child]
     player: Player,
+
+    #[children]
     excrements: Vec<Excrement>,
 
     transform: Transform,
     renderables: Vec<Renderable>,
 }
 
-impl Component for SandField {
-    fn transform(&self) -> &Transform {
-        &self.transform
-    }
-
-    fn renderables(&self) -> &[Renderable] {
-        &self.renderables
-    }
-
+impl ComponentLifecycle for SandField {
     fn update(&mut self, ctx: &mut Context) {
         self.restrict_player_movement();
 
@@ -30,22 +27,6 @@ impl Component for SandField {
             self.excrements
                 .push(Excrement::new(self.player.transform.position));
         }
-    }
-
-    fn children(&self) -> Vec<&dyn Component> {
-        let mut children = vec![&self.player as &dyn Component];
-        children.extend(self.excrements.iter().map(|cmp| cmp as &dyn Component));
-        children
-    }
-
-    fn children_mut(&mut self) -> Vec<&mut dyn Component> {
-        let mut children = vec![&mut self.player as &mut dyn Component];
-        children.extend(
-            self.excrements
-                .iter_mut()
-                .map(|cmp| cmp as &mut dyn Component),
-        );
-        children
     }
 }
 
@@ -55,7 +36,7 @@ impl SandField {
             player: Player::new(),
             excrements: Vec::default(),
 
-            transform: Transform::from_position(Vertex2::new(250.0, 250.0)),
+            transform: Transform::from_position(Vertex2::new(SIZE / 2.0, SIZE / 2.0)),
             renderables: vec![Renderable {
                 transform: Transform::default(),
                 vertices: shape_factory::square(SIZE),
@@ -72,20 +53,20 @@ impl SandField {
     }
 
     fn restrict_player_movement(&mut self) {
-        let player_dim =
-            Dimensions::new(self.player.transform.position, player::SIZE, player::SIZE);
-        let field_dim = Dimensions::new(self.transform.position, SIZE, SIZE);
+        let player = Dimensions::new(self.player.transform.position, player::SIZE, player::SIZE);
+        let field = Dimensions::new(self.transform.position, SIZE, SIZE);
 
-        if player_dim.right() > field_dim.right() {
-            self.player.transform.position.x = field_dim.right() - player_dim.half_width();
-        } else if player_dim.left() < field_dim.left() {
-            self.player.transform.position.x = field_dim.left() + player_dim.half_width();
+        info!("{}", player.top());
+        if player.right() > field.right() {
+            self.player.transform.position.x = field.right() - player.half_width();
+        } else if player.left() < field.left() {
+            self.player.transform.position.x = field.left() + player.half_width();
         }
 
-        if player_dim.top() < field_dim.top() {
-            self.player.transform.position.y = field_dim.top() + player_dim.half_height();
-        } else if player_dim.bottom() > field_dim.bottom() {
-            self.player.transform.position.y = field_dim.bottom() - player_dim.half_height();
+        if player.top() < field.top() {
+            self.player.transform.position.y = field.top() + player.half_height();
+        } else if player.bottom() > field.bottom() {
+            self.player.transform.position.y = field.bottom() - player.half_height();
         }
     }
 }

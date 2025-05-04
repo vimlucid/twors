@@ -1,5 +1,5 @@
 //! A set of utilities to create vertices for various shapes.
-//! 
+//!
 //! > **Note:** all of the shapes created via this module have a center of (0.0, 0.0) - this means
 //! > that the vertices of the left side of the shape have a negative `x` vertex value.
 

@@ -1,13 +1,19 @@
 mod eye;
 mod head;
+mod mouth;
 
+use mouth::Mouth;
 use twors::prelude::*;
 
 pub const SIZE: f32 = 30.0;
 
 const SPEED: f32 = 200.0;
 
+#[derive(Component)]
 pub struct Player {
+    #[child]
+    mouth: Mouth,
+
     pub transform: Transform,
     renderables: Vec<Renderable>,
 }
@@ -15,6 +21,7 @@ pub struct Player {
 impl Player {
     pub fn new() -> Self {
         Self {
+            mouth: Mouth::new(Vertex2::new(0.0, 2.0)),
             transform: Transform::default(),
             renderables: vec![
                 head::new(),
@@ -25,15 +32,7 @@ impl Player {
     }
 }
 
-impl Component for Player {
-    fn transform(&self) -> &Transform {
-        &self.transform
-    }
-
-    fn renderables(&self) -> &[Renderable] {
-        &self.renderables
-    }
-
+impl ComponentLifecycle for Player {
     fn update(&mut self, ctx: &mut Context) {
         if ctx.input.keyboard.is_down(Key::A) {
             self.transform.position += Vertex2 {
@@ -62,13 +61,5 @@ impl Component for Player {
                 y: SPEED * ctx.delta_time(),
             };
         }
-    }
-
-    fn children(&self) -> Vec<&dyn Component> {
-        Vec::default()
-    }
-
-    fn children_mut(&mut self) -> Vec<&mut dyn Component> {
-        Vec::default()
     }
 }

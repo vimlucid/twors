@@ -58,6 +58,14 @@ pub struct Renderable {
     pub layer: Layer,
 }
 
+#[doc(hidden)]
+pub trait ComponentGetter {
+    fn transform(&self) -> &Transform;
+    fn renderables(&self) -> &[Renderable];
+    fn children(&self) -> Vec<&dyn Component>;
+    fn children_mut(&mut self) -> Vec<&mut dyn Component>;
+}
+
 /// The `Component` is the bread and butter of our application - see the methods' documentation
 /// and the example below for details.
 ///
@@ -66,6 +74,7 @@ pub struct Renderable {
 /// ```rust
 /// use twors::prelude::*;
 ///
+/// #[derive(Component)]
 /// pub struct MyComponent {
 ///     component_state: i32,
 ///
@@ -85,15 +94,7 @@ pub struct Renderable {
 ///     }
 /// }
 ///
-/// impl Component for MyComponent {
-///     fn transform(&self) -> &Transform {
-///         &self.transform
-///     }
-///
-///     fn renderables(&self) -> &[Renderable] {
-///         &self.renderables
-///     }
-///
+/// impl ComponentLifecycle for MyComponent {
 ///     fn update(&mut self, ctx: &mut Context) {
 ///         // Read mouse & keyboard input
 ///         if ctx.input.mouse.is_pressed(Mouse::LMB) || ctx.input.keyboard.is_down(Key::A) {}
@@ -105,42 +106,16 @@ pub struct Renderable {
 ///         const SPEED: f32 = 20.0;
 ///         self.transform.position.x += SPEED * ctx.delta_time();
 ///     }
-///
-///     fn children(&self) -> Vec<&dyn Component> {
-///         Vec::default()
-///     }
-///
-///     fn children_mut(&mut self) -> Vec<&mut dyn Component> {
-///         Vec::default()
-///     }
 /// }
 /// ```
-pub trait Component {
-    /// the location/scale of the component - define it as a `Transform` field in your
-    /// component and return it as a reference from this getter. See [Transform](Transform).
-    fn transform(&self) -> &Transform;
-
-    /// - `renderables` - the "visual" part of a component.
-    ///     - a component that won't be visible can have 0 renderables
-    ///     - define multiple renderables and offset them via their transform to compose a combination
-    ///       of shapes
-    ///     - define it as a `Vec<Renderable>` field in your component and return it as a slice
-    fn renderables(&self) -> &[Renderable];
-
-    /// - `update` - this is where the behavior of the component is defined
-    ///     - use `&mut self` to update the component state and renderables
-    ///     - use the `&mut Context` value to
-    ///         - read the delta time for multiplication of values used for movement over time
-    ///         - read input from the mouse/keyboard
+pub trait ComponentLifecycle {
+    /// This is where the behavior of the component is defined
+    /// - use `&mut self` to update the component state and renderables
+    /// - use the `&mut Context` value to
+    ///     - read the delta time for multiplication of values used for movement over time
+    ///     - read input from the mouse/keyboard
     fn update(&mut self, ctx: &mut Context);
-
-    /// - `children` - all child components' references (stored as component fields)
-    ///   have to be returned via this method for the engine to render their
-    ///   renderables. This is done recursively for the children of the children.
-    fn children(&self) -> Vec<&dyn Component>;
-
-    /// - `children_mut` - all child components' references (stored as component fields)
-    ///   have to be returned via this method for the engine to call their `update`
-    ///   method. This is done recursively for the children of the children.
-    fn children_mut(&mut self) -> Vec<&mut dyn Component>;
 }
+
+pub trait Component: ComponentLifecycle + ComponentGetter {}
+impl<T: ComponentLifecycle + ComponentGetter> Component for T {}

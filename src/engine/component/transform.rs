@@ -1,5 +1,5 @@
-use std::ops::Add;
 use crate::Vertex2;
+use std::ops::Add;
 
 const DEFAULT_SCALE: Vertex2<f32> = const { Vertex2::new(1.0, 1.0) };
 
@@ -39,4 +39,3 @@ impl Default for Transform {
         }
     }
 }
-
