@@ -22,18 +22,12 @@ use web_time::{Duration, SystemTime}; // std::time::SystemTime panics in WASM
 /// - provide the delta time value
 pub struct Context<'a> {
     pub input: &'a Input,
-    pub absolute_parent: Transform,
-
     delta_time: f32,
 }
 
 impl<'a> Context<'a> {
-    pub fn new(input: &'a Input, absolute_parent: Transform, delta_time: f32) -> Self {
-        Self {
-            input,
-            absolute_parent,
-            delta_time,
-        }
+    pub fn new(input: &'a Input, delta_time: f32) -> Self {
+        Self { input, delta_time }
     }
 
     /// This is the number of seconds that passed since the last frame in the main loop.
@@ -141,12 +135,12 @@ impl Engine {
         {
             let delta_time = Engine::calc_delta_and_update_last(state.last_time.borrow_mut());
             let input_borrow = state.input.borrow();
-            let mut ctx = Context::new(&input_borrow, Transform::default(), delta_time);
+            let mut ctx = Context::new(&input_borrow, delta_time);
 
             let mut components = state.components.borrow_mut();
             let mut components: Vec<&mut dyn Component> =
                 components.iter_mut().map(|cmp| cmp.as_mut() as _).collect();
-            Engine::update_components(components.as_mut_slice(), &mut ctx);
+            Engine::update_components(components.as_mut_slice(), &mut ctx, &Transform::default());
         }
 
         let components = state.components.borrow();
@@ -168,24 +162,26 @@ impl Engine {
         delta_time
     }
 
-    fn update_components(components: &mut [&mut dyn Component], ctx: &mut Context) {
-        let build_ctx = |component: &dyn Component| {
-            let absolute_parent = component.transform().clone() + &ctx.absolute_parent;
-            Context::new(ctx.input, absolute_parent, ctx.delta_time())
-        };
+    fn update_components(
+        components: &mut [&mut dyn Component],
+        ctx: &mut Context,
+        parent_transform: &Transform,
+    ) {
+        let mut ctx = Context::new(ctx.input, ctx.delta_time());
 
         // Children must be updated first so that parent components can have the final say in the
         // children's state (since the parents are responsible for the management).
         // Otherwise a child's state in the current frame can get modified by the parent state in
         // the next frame and we would get jittery movement.
         for component in components.iter_mut() {
-            let mut ctx = build_ctx(*component);
+            // NOTE: We can avoid clone by providing a one-shot split method.
+            let transform = parent_transform.clone() + component.transform();
             let mut children = component.children_mut();
-            Engine::update_components(children.as_mut_slice(), &mut ctx);
+            Engine::update_components(children.as_mut_slice(), &mut ctx, &transform);
         }
 
         for component in components.iter_mut() {
-            let mut ctx = build_ctx(*component);
+            component.transform_mut().parent = Some(Box::new(parent_transform.clone()));
             component.update(&mut ctx);
         }
     }

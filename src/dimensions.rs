@@ -4,6 +4,7 @@
 
 use crate::Vertex2;
 
+#[derive(Debug)]
 pub struct Dimensions {
     position: Vertex2<f32>,
     width: f32,

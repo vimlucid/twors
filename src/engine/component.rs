@@ -61,7 +61,10 @@ pub struct Renderable {
 #[doc(hidden)]
 pub trait ComponentGetter {
     fn transform(&self) -> &Transform;
+    fn transform_mut(&mut self) -> &mut Transform;
+
     fn renderables(&self) -> &[Renderable];
+
     fn children(&self) -> Vec<&dyn Component>;
     fn children_mut(&mut self) -> Vec<&mut dyn Component>;
 }

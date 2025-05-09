@@ -39,6 +39,10 @@ fn gen_component_getter_impl(input: &DeriveInput) -> Result<TokenStream, TokenSt
                 &self.transform
             }
 
+            fn transform_mut(&mut self) -> &mut twors::Transform {
+                &mut self.transform
+            }
+
             fn renderables(&self) -> &[twors::Renderable] {
                 &self.renderables
             }

@@ -21,7 +21,7 @@ pub struct Battlefield {
 
 impl ComponentLifecycle for Battlefield {
     fn update(&mut self, ctx: &mut Context) {
-        self.restrict_player_movement();
+        self.restrict_player_within_field();
 
         if ctx.input.mouse.is_pressed(Mouse::LMB) {
             self.bombs.push(Bomb::new(self.player.transform.position));
@@ -36,8 +36,8 @@ impl Battlefield {
             bombs: Vec::default(),
 
             transform: Transform::from_position(Vertex2::new(
+                SIZE / 2.0 + 100.0,
                 SIZE / 2.0 + 300.0,
-                SIZE / 2.0 + 400.0,
             )),
             renderables: vec![Renderable {
                 transform: Transform::default(),
@@ -54,20 +54,49 @@ impl Battlefield {
         }
     }
 
-    fn restrict_player_movement(&mut self) {
-        let player = Dimensions::new(self.player.transform.position, player::SIZE, player::SIZE);
-        let field = Dimensions::new(Vertex2::default(), SIZE, SIZE);
+    fn restrict_player_within_field(&mut self) {
+        let player_dim = Dimensions::new(
+            self.player.transform.absolute().position,
+            player::SIZE,
+            player::SIZE,
+        );
+        let field_dim = Dimensions::new(self.transform.absolute().position, SIZE, SIZE);
 
-        if player.right() > field.right() {
-            self.player.transform.position.x = field.right() - player.half_width();
-        } else if player.left() < field.left() {
-            self.player.transform.position.x = field.left() + player.half_width();
+        let player_transform = self.player.transform.absolute().clone();
+        let player_transform =
+            Battlefield::restrict_position(player_transform, &player_dim, &field_dim);
+        self.player.transform.set_absolute(&player_transform);
+    }
+
+    fn restrict_position(
+        mut player: Transform,
+        player_dim: &Dimensions,
+        field_dim: &Dimensions,
+    ) -> Transform {
+        player.position.x =
+            Battlefield::restrict_horizontal(player.position.x, player_dim, field_dim);
+        player.position.y =
+            Battlefield::restrict_vertical(player.position.y, player_dim, field_dim);
+        player
+    }
+
+    fn restrict_horizontal(player_x: f32, player_dim: &Dimensions, field_dim: &Dimensions) -> f32 {
+        if player_dim.right() > field_dim.right() {
+            field_dim.right() - player_dim.half_width()
+        } else if player_dim.left() < field_dim.left() {
+            field_dim.left() + player_dim.half_width()
+        } else {
+            player_x
         }
+    }
 
-        if player.top() < field.top() {
-            self.player.transform.position.y = field.top() + player.half_height();
-        } else if player.bottom() > field.bottom() {
-            self.player.transform.position.y = field.bottom() - player.half_height();
+    fn restrict_vertical(player_y: f32, player_dim: &Dimensions, field_dim: &Dimensions) -> f32 {
+        if player_dim.top() < field_dim.top() {
+            field_dim.top() + player_dim.half_height()
+        } else if player_dim.bottom() > field_dim.bottom() {
+            field_dim.bottom() - player_dim.half_height()
+        } else {
+            player_y
         }
     }
 }

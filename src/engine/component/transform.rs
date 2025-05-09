@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::Vertex2;
 use std::ops::{Add, Sub};
 
@@ -9,28 +11,7 @@ const DEFAULT_SCALE: Vertex2<f32> = const { Vertex2::new(1.0, 1.0) };
 pub struct Transform {
     pub position: Vertex2<f32>,
     pub scale: Vertex2<f32>,
-}
-
-impl Add<&Transform> for Transform {
-    type Output = Transform;
-
-    fn add(self, rhs: &Self) -> Self::Output {
-        Self::Output {
-            position: self.position + rhs.position,
-            scale: self.scale * rhs.scale,
-        }
-    }
-}
-
-impl Sub<&Transform> for Transform {
-    type Output = Transform;
-
-    fn sub(self, rhs: &Self) -> Self::Output {
-        Self::Output {
-            position: self.position - rhs.position,
-            scale: self.scale / rhs.scale,
-        }
-    }
+    pub parent: Option<Box<Transform>>,
 }
 
 impl Transform {
@@ -38,6 +19,49 @@ impl Transform {
         Self {
             position,
             scale: DEFAULT_SCALE,
+            parent: None,
+        }
+    }
+
+    pub fn absolute(&self) -> Transform {
+        let parent = self.get_parent();
+        parent + self
+    }
+
+    pub fn set_absolute(&mut self, transform: &Transform) {
+        let parent = self.get_parent();
+        *self = transform.clone() - &parent;
+        info!("{:#?}", *self);
+    }
+
+    fn get_parent(&self) -> Transform {
+        match &self.parent {
+            Some(parent) => *parent.clone(),
+            None => Transform::default(),
+        }
+    }
+}
+
+impl Add<&Transform> for Transform {
+    type Output = Transform;
+
+    fn add(self, rhs: &Transform) -> Self::Output {
+        Self::Output {
+            position: self.position + rhs.position,
+            scale: self.scale * rhs.scale,
+            parent: self.parent,
+        }
+    }
+}
+
+impl Sub<&Transform> for Transform {
+    type Output = Transform;
+
+    fn sub(self, rhs: &Transform) -> Self::Output {
+        Self::Output {
+            position: self.position - rhs.position,
+            scale: self.scale / rhs.scale,
+            parent: self.parent,
         }
     }
 }
@@ -47,6 +71,7 @@ impl Default for Transform {
         Self {
             position: Vertex2::default(),
             scale: DEFAULT_SCALE,
+            parent: None,
         }
     }
 }
