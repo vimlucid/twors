@@ -2,7 +2,6 @@ use crate::{
     bomb::Bomb,
     player::{self, Player},
 };
-use log::info;
 use twors::{dimensions::Dimensions, prelude::*, shape_factory};
 
 const SIZE: f32 = 400.0;

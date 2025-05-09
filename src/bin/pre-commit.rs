@@ -1,3 +1,5 @@
+// TODO: Disable cargo install binary
+
 use std::{
     io,
     process::{Command, ExitCode, ExitStatus},
@@ -19,7 +21,7 @@ fn check_fmt() -> io::Result<ExitStatus> {
     println!("Running rustfmt...");
 
     Command::new("cargo")
-        .args(["fmt", "--check"])
+        .args(["fmt", "--check", "--all"])
         .spawn()?
         .wait()
 }
@@ -28,7 +30,7 @@ fn check_clippy() -> io::Result<ExitStatus> {
     println!("Running clippy...");
 
     Command::new("cargo")
-        .args(["clippy", "--", "-D", "warnings"])
+        .args(["clippy", "--all", "--", "-D", "warnings"])
         .spawn()?
         .wait()
 }
