@@ -1,5 +1,5 @@
 use crate::{
-    excrement::Excrement,
+    bomb::Bomb,
     player::{self, Player},
 };
 use log::info;
@@ -8,35 +8,37 @@ use twors::{dimensions::Dimensions, prelude::*, shape_factory};
 const SIZE: f32 = 400.0;
 
 #[derive(Component)]
-pub struct SandField {
+pub struct Battlefield {
     #[child]
     player: Player,
 
     #[children]
-    excrements: Vec<Excrement>,
+    bombs: Vec<Bomb>,
 
     transform: Transform,
     renderables: Vec<Renderable>,
 }
 
-impl ComponentLifecycle for SandField {
+impl ComponentLifecycle for Battlefield {
     fn update(&mut self, ctx: &mut Context) {
         self.restrict_player_movement();
 
         if ctx.input.mouse.is_pressed(Mouse::LMB) {
-            self.excrements
-                .push(Excrement::new(self.player.transform.position));
+            self.bombs.push(Bomb::new(self.player.transform.position));
         }
     }
 }
 
-impl SandField {
+impl Battlefield {
     pub fn new() -> Self {
         Self {
             player: Player::new(),
-            excrements: Vec::default(),
+            bombs: Vec::default(),
 
-            transform: Transform::from_position(Vertex2::new(SIZE / 2.0, SIZE / 2.0)),
+            transform: Transform::from_position(Vertex2::new(
+                SIZE / 2.0 + 300.0,
+                SIZE / 2.0 + 400.0,
+            )),
             renderables: vec![Renderable {
                 transform: Transform::default(),
                 vertices: shape_factory::square(SIZE),
@@ -54,9 +56,8 @@ impl SandField {
 
     fn restrict_player_movement(&mut self) {
         let player = Dimensions::new(self.player.transform.position, player::SIZE, player::SIZE);
-        let field = Dimensions::new(self.transform.position, SIZE, SIZE);
+        let field = Dimensions::new(Vertex2::default(), SIZE, SIZE);
 
-        info!("{}", player.top());
         if player.right() > field.right() {
             self.player.transform.position.x = field.right() - player.half_width();
         } else if player.left() < field.left() {

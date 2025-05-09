@@ -9,7 +9,7 @@ use crate::{Layer, Transform, Vertex2, engine::canvas::Canvas, error::Result};
 use component::Component;
 use input::Input;
 use std::{
-    cell::{Ref, RefCell, RefMut},
+    cell::{RefCell, RefMut},
     rc::Rc,
 };
 use web_sys::{CanvasRenderingContext2d, Window};
@@ -21,14 +21,19 @@ use web_time::{Duration, SystemTime}; // std::time::SystemTime panics in WASM
 /// - read mouse/keyboard inputs
 /// - provide the delta time value
 pub struct Context<'a> {
-    pub input: Ref<'a, Input>,
+    pub input: &'a Input,
+    pub absolute_parent: Transform,
 
     delta_time: f32,
 }
 
 impl<'a> Context<'a> {
-    pub fn new(input: Ref<'a, Input>, delta_time: f32) -> Self {
-        Self { input, delta_time }
+    pub fn new(input: &'a Input, absolute_parent: Transform, delta_time: f32) -> Self {
+        Self {
+            input,
+            absolute_parent,
+            delta_time,
+        }
     }
 
     /// This is the number of seconds that passed since the last frame in the main loop.
@@ -135,7 +140,9 @@ impl Engine {
         // mutable borrow afterwards.
         {
             let delta_time = Engine::calc_delta_and_update_last(state.last_time.borrow_mut());
-            let mut ctx = Context::new(state.input.borrow(), delta_time);
+            let input_borrow = state.input.borrow();
+            let mut ctx = Context::new(&input_borrow, Transform::default(), delta_time);
+
             let mut components = state.components.borrow_mut();
             let mut components: Vec<&mut dyn Component> =
                 components.iter_mut().map(|cmp| cmp.as_mut() as _).collect();
@@ -162,17 +169,24 @@ impl Engine {
     }
 
     fn update_components(components: &mut [&mut dyn Component], ctx: &mut Context) {
+        let build_ctx = |component: &dyn Component| {
+            let absolute_parent = component.transform().clone() + &ctx.absolute_parent;
+            Context::new(ctx.input, absolute_parent, ctx.delta_time())
+        };
+
         // Children must be updated first so that parent components can have the final say in the
         // children's state (since the parents are responsible for the management).
         // Otherwise a child's state in the current frame can get modified by the parent state in
         // the next frame and we would get jittery movement.
         for component in components.iter_mut() {
+            let mut ctx = build_ctx(*component);
             let mut children = component.children_mut();
-            Engine::update_components(children.as_mut_slice(), ctx);
+            Engine::update_components(children.as_mut_slice(), &mut ctx);
         }
 
         for component in components.iter_mut() {
-            component.update(ctx);
+            let mut ctx = build_ctx(*component);
+            component.update(&mut ctx);
         }
     }
 

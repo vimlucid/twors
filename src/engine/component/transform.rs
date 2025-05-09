@@ -1,5 +1,5 @@
 use crate::Vertex2;
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
 const DEFAULT_SCALE: Vertex2<f32> = const { Vertex2::new(1.0, 1.0) };
 
@@ -18,6 +18,17 @@ impl Add<&Transform> for Transform {
         Self::Output {
             position: self.position + rhs.position,
             scale: self.scale * rhs.scale,
+        }
+    }
+}
+
+impl Sub<&Transform> for Transform {
+    type Output = Transform;
+
+    fn sub(self, rhs: &Self) -> Self::Output {
+        Self::Output {
+            position: self.position - rhs.position,
+            scale: self.scale / rhs.scale,
         }
     }
 }

@@ -1,12 +1,12 @@
 use twors::{prelude::*, shape_factory};
 
 #[derive(Component)]
-pub struct Excrement {
+pub struct Bomb {
     transform: Transform,
     renderables: Vec<Renderable>,
 }
 
-impl Excrement {
+impl Bomb {
     pub fn new(position: Vertex2<f32>) -> Self {
         Self {
             transform: Transform::from_position(position),
@@ -26,6 +26,6 @@ impl Excrement {
     }
 }
 
-impl ComponentLifecycle for Excrement {
+impl ComponentLifecycle for Bomb {
     fn update(&mut self, _: &mut Context) {}
 }
