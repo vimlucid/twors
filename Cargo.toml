@@ -1,5 +1,5 @@
 [workspace]
-members = ["examples/playground", "macros"]
+members = ["examples/playground", "twors_derive"]
 
 [package]
 name = "twors"
@@ -19,7 +19,7 @@ exclude = []
 [dependencies]
 # Public
 web-sys = { version = "0.3.77", features = ["CanvasRenderingContext2d", "Document", "Element", "HtmlCanvasElement", "KeyboardEvent", "MouseEvent", "Window"] }
-macros = { path = "./macros" }
+twors_derive = { path = "./twors_derive" }
 
 # Private
 log = "0.4.27"
