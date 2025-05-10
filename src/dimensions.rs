@@ -43,6 +43,13 @@ impl Dimensions {
     pub fn bottom(&self) -> f32 {
         self.position.y + self.half_height()
     }
+
+    pub fn contains(&self, position: Vertex2<f32>) -> bool {
+        position.x >= self.left()
+            && position.x <= self.right()
+            && position.y >= self.top()
+            && position.y <= self.bottom()
+    }
 }
 
 #[cfg(test)]
@@ -72,5 +79,17 @@ mod tests {
         assert_eq!(dimensions.right(), POS_X + (WIDTH / 2.0));
         assert_eq!(dimensions.top(), POS_Y - (HEIGHT / 2.0));
         assert_eq!(dimensions.bottom(), POS_Y + (HEIGHT / 2.0));
+    }
+
+    #[test]
+    fn contains() {
+        let dimensions = Dimensions::new(POSITION, WIDTH, HEIGHT);
+
+        assert!(!dimensions.contains(Vertex2::new(POS_X + WIDTH, POS_Y)));
+        assert!(!dimensions.contains(Vertex2::new(POS_X - WIDTH, POS_Y)));
+        assert!(!dimensions.contains(Vertex2::new(POS_X, POS_Y + HEIGHT)));
+        assert!(!dimensions.contains(Vertex2::new(POS_X, POS_Y - HEIGHT)));
+
+        assert!(dimensions.contains(Vertex2::new(POS_X, POS_Y)));
     }
 }

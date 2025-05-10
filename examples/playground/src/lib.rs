@@ -3,7 +3,7 @@ mod bomb;
 mod player;
 
 use battlefield::Battlefield;
-use twors::{Engine, Result};
+use twors::{prelude::*, Result};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]

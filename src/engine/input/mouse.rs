@@ -42,6 +42,11 @@ impl Mouse {
         Ok(())
     }
 
+    pub fn position(&self) -> Vertex2<f32> {
+        let position = self.position.borrow();
+        Vertex2::new(position.x as f32, position.y as f32)
+    }
+
     pub fn is_pressed(&self, key: Button) -> bool {
         self.state_map.borrow().is_pressed(&key)
     }

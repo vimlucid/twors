@@ -8,7 +8,7 @@ use web_sys::CanvasRenderingContext2d;
 /// Defines the priority of the [Renderable](Renderable) - lower layers have higher priority (e.g.
 /// a `Layer::One` [Renderable](Renderable) will always appear on top of a `Layer::Two`
 /// [Renderable](Renderable)
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum Layer {
     One,
     Two,
@@ -43,6 +43,7 @@ pub enum Layer {
 ///     }
 /// }
 /// ```
+#[derive(Debug)]
 pub struct Renderable {
     pub transform: Transform,
 
