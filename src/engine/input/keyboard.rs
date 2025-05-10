@@ -7,7 +7,6 @@ use log::warn;
 use std::{cell::RefCell, rc::Rc};
 use web_sys::{KeyboardEvent, Window};
 
-/// Used in the `keyboard` field in the [Input](super) module API
 #[derive(Eq, PartialEq, Hash, Clone, Copy)]
 pub enum Button {
     ArrowDown,

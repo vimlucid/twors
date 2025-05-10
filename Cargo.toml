@@ -3,7 +3,7 @@ members = ["examples/playground", "macros"]
 
 [package]
 name = "twors"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 authors = ["Lyudmil Grigorov"]
 description = "A simple Rust 2D game engine based on canvas and WASM"

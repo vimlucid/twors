@@ -1,10 +1,8 @@
-use crate::{
-    bomb::Bomb,
+use super::{
+    bomb::{Bomb, DragState},
     player::{self, Player},
 };
 use twors::{dimensions::Dimensions, prelude::*, shape_factory};
-
-const SIZE: f32 = 400.0;
 
 #[derive(Component)]
 pub struct Battlefield {
@@ -18,16 +16,7 @@ pub struct Battlefield {
     renderables: Vec<Renderable>,
 }
 
-impl ComponentLifecycle for Battlefield {
-    fn update(&mut self, ctx: &mut Context) {
-        self.restrict_player_within_field();
-
-        if ctx.input.mouse.is_pressed(Mouse::LMB) {
-            self.bombs.push(Bomb::new(self.player.transform.position));
-        }
-    }
-}
-
+const SIZE: f32 = 800.0;
 const OFFSET: f32 = 50.0;
 
 impl Battlefield {
@@ -52,6 +41,16 @@ impl Battlefield {
                 },
                 layer: twors::Layer::Five,
             }],
+        }
+    }
+
+    fn drag_bombs(&mut self, mouse_position: Vertex2<f32>) {
+        for bomb in &mut self.bombs {
+            if let DragState::Dragged(relative_mouse_position) = bomb.drag_state() {
+                let mut bomb_transform = bomb.transform().clone();
+                bomb_transform.position = mouse_position - relative_mouse_position;
+                bomb.transform_mut().set_absolute(&bomb_transform);
+            }
         }
     }
 
@@ -98,6 +97,17 @@ impl Battlefield {
             field_dim.bottom() - player_dim.half_height()
         } else {
             player_y
+        }
+    }
+}
+
+impl ComponentLifecycle for Battlefield {
+    fn update(&mut self, ctx: &mut Context) {
+        self.restrict_player_within_field();
+        self.drag_bombs(ctx.input.mouse.position());
+
+        if ctx.input.mouse.is_pressed(Mouse::LMB) {
+            self.bombs.push(Bomb::new(self.player.transform.position));
         }
     }
 }

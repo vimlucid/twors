@@ -5,7 +5,7 @@ mod mouth;
 use mouth::Mouth;
 use twors::prelude::*;
 
-pub const SIZE: f32 = 30.0;
+pub const SIZE: f32 = 60.0;
 
 const SPEED: f32 = 200.0;
 
@@ -25,8 +25,8 @@ impl Player {
             transform: Transform::default(),
             renderables: vec![
                 head::new(),
-                eye::new(Vertex2::new(-8.0, -8.0)),
-                eye::new(Vertex2::new(8.0, -8.0)),
+                eye::new(Vertex2::new(-15.0, -8.0)),
+                eye::new(Vertex2::new(15.0, -8.0)),
             ],
         }
     }

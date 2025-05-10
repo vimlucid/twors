@@ -1,9 +1,14 @@
 # TwoRS
 
-![development](https://img.shields.io/badge/maintenance%20status-actively%20developed-brightgreen)
 ![crates.io](https://img.shields.io/crates/v/twors)
 
 Easily render 2D graphics in a canvas using WASM - entirely powered by Rust!!! 🦀
+
+## 🙋 Who is this project for?
+
+This tiny renderer is for people who:
+- Need an example on how setup WASM & interact with the canvas
+- Play around with Rust the fun way - by making a small 2D game
 
 ## 😎 Why Rust/WASM?
 
@@ -25,8 +30,10 @@ is it making use of some advanced pre-existing Rust library. So why Rust then?
 
 ## ⚡ Quick start
 
-- To quickly play with `twors` you can make use of the `examples/playground`
-  crate in this repo - it contains code for moving a rectangle via the WASD keys.
+- To quickly play with `twors` you can run the `examples/playground` crate in this repo
+  - Move the player via the **WASD keys** (player can't exit the green area)
+  - Spawn items at the players' location via the **left mouse button**
+  - Drag spawned items via the **right mouse button**
 
 ```bash
 git clone https://github.com/vimlucid/twors
@@ -42,17 +49,11 @@ cargo make watch # this assumes you have the `cp` command - e.g. it won't work i
 
 ## ✨ Features
 
-✅ `TwoRS`'s goal is to be simple. It aims to provide:
+✅ `TwoRS`'s goal is to be simple. It provides:
 
 - ✅ A main loop with precalculated [delta time](https://en.wikipedia.org/wiki/Delta_timing)
 - ✅ Keyboard/mouse
-- 🔄 Component system
-- ✔️ Rectangle-based 2D collision detection
-- 🔄 Utilities
-  - ✔️ Linear/smooth interpolation (for animations over time)
-  - ✔️ Bezier curves
-  - 🔄 Factories for various shapes & styling
-- ✔️ Benchmark
+- ✅ Basic component system (not [ECS](https://en.wikipedia.org/wiki/Entity_component_system))
 
 ❌ `TwoRS` does not **currently** have (and aim) to provide:
 
@@ -180,12 +181,6 @@ will refuse to run it. A great server that does this automatically is
 cargo intall miniserve
 miniserve ./pkg --index index.html
 ```
-
-## 🧱 Fundamentals
-
-- A guide will be published once the API stabilizes.
-- In the meantime take a look at the [Engine](Engine) struct and drill down for details and
-  examples.
 
 ## 💻 Development
 
