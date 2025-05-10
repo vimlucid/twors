@@ -14,7 +14,7 @@ impl Bomb {
                 transform: Transform::default(),
                 vertices: shape_factory::square(10.0),
                 style: |ctx: &CanvasRenderingContext2d| {
-                    ctx.set_fill_style_str("brown");
+                    ctx.set_fill_style_str("white");
                     ctx.set_line_width(1.0);
                     ctx.set_stroke_style_str("black");
                     ctx.stroke();

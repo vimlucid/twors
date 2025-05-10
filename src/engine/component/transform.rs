@@ -1,5 +1,3 @@
-use log::info;
-
 use crate::Vertex2;
 use std::ops::{Add, Sub};
 
@@ -31,7 +29,6 @@ impl Transform {
     pub fn set_absolute(&mut self, transform: &Transform) {
         let parent = self.get_parent();
         *self = transform.clone() - &parent;
-        info!("{:#?}", *self);
     }
 
     fn get_parent(&self) -> Transform {

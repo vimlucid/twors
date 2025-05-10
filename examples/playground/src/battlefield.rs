@@ -28,6 +28,8 @@ impl ComponentLifecycle for Battlefield {
     }
 }
 
+const OFFSET: f32 = 50.0;
+
 impl Battlefield {
     pub fn new() -> Self {
         Self {
@@ -35,14 +37,14 @@ impl Battlefield {
             bombs: Vec::default(),
 
             transform: Transform::from_position(Vertex2::new(
-                SIZE / 2.0 + 100.0,
-                SIZE / 2.0 + 300.0,
+                SIZE / 2.0 + OFFSET,
+                SIZE / 2.0 + OFFSET,
             )),
             renderables: vec![Renderable {
                 transform: Transform::default(),
                 vertices: shape_factory::square(SIZE),
                 style: |ctx: &CanvasRenderingContext2d| {
-                    ctx.set_fill_style_str("yellow");
+                    ctx.set_fill_style_str("green");
                     ctx.set_line_width(1.0);
                     ctx.set_stroke_style_str("black");
                     ctx.stroke();

@@ -12,7 +12,7 @@ impl Mouth {
             transform: Transform::from_position(position),
             renderables: vec![Renderable {
                 transform: Transform::from_position(position),
-                vertices: shape_factory::rectangle(15.0, 5.0),
+                vertices: shape_factory::rectangle(15.0, 2.0),
                 style: |ctx: &CanvasRenderingContext2d| {
                     ctx.set_fill_style_str("black");
                     ctx.set_line_width(1.0);
